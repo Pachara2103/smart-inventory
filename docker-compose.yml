@@ -1,15 +1,17 @@
 version: '3.8'
+
 services:
-  dev-db:
-    image: postgres:13
-    ports:
-      - 5434:5432
+  mongo:
+    image: mongo
+    restart: always
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: 123
-      POSTGRES_DB: nest
-    networks:
-      - mynet
-networks:
-  mynet:
-    driver: bridge
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: '1234'
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+
+volumes:
+  mongo-data:
+    driver: local

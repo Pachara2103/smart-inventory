@@ -1,12 +1,23 @@
 import { Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
 import { UserModule } from './user/user.module';
-import { BookmarkModule } from './bookmark/bookmark.module';
-import { PrismaModule } from './prisma/prisma.module';
-import { PrismaService } from './prisma/prisma.service';
+import { MongooseModule } from '@nestjs/mongoose';
 
 @Module({
-  imports: [AuthModule, UserModule, BookmarkModule, PrismaModule],
-  providers: [PrismaService],
+  imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+      envFilePath: '.env',
+    }),
+    MongooseModule.forRoot(
+      'mongodb://localhost:27017', {
+      user: process.env.MONGO_USER,
+      pass: process.env.MONGO_PASS,
+      dbName: process.env.MONGO_DB,
+    }),
+    AuthModule,
+    UserModule,
+  ],
 })
-export class AppModule {}
+export class AppModule { }
