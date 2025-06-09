@@ -11,7 +11,7 @@
 #ศึกษาวิธีทำ Login register with Nestjs & using mongo  from Youtube Channel  testing API by using postman
 #ศึกษาการใช้ vue frontend
 
-<div> โครงสร้าง 
+<div> โครงสร้าง </div>
    <div> smart-inventory</div>
 ├── frontend/          # Vue.js
 ├── backend/       # NestJS
@@ -42,4 +42,3 @@
 ├── transactions/  # ประวัติการเบิก/เพิ่ม
 ├── common/        # Guard, Interceptor, DTO แชร์
 ├── app.module.ts
-</div>
