@@ -13,19 +13,14 @@
 
 <div> โครงสร้าง 
    <div> smart-inventory</div>
-
-   <div>
-  📦 smart-inventory-system/
 ├── frontend/          # Vue.js
 ├── backend/       # NestJS
 ├── helm-chart/        # if needed
 ├── terraform/         # if needed
 ├── docker-compose.yml 
 └── README.md
-  </div>
 
-   <div> Frontend
-   <div>   
+   <div> Frontend <ฝdiv>   
 ├── views/
 │   ├── LoginView.vue
 │   ├── DashboardView.vue
@@ -39,10 +34,7 @@
 │   └── userStore.ts
 └── services/
     └── api.ts (axios instance)
-    
-    </div> 
-    Backend
-   <div> 
+   <div> Backend </div>
 
 ├── auth/          # ระบบ auth, JWT
 ├── users/         # ผู้ใช้งาน
@@ -50,10 +42,4 @@
 ├── transactions/  # ประวัติการเบิก/เพิ่ม
 ├── common/        # Guard, Interceptor, DTO แชร์
 ├── app.module.ts
-
-   </div>
-   </div>
-
-
-
 </div>
