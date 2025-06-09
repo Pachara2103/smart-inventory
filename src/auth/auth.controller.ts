@@ -1,7 +1,7 @@
 import { Controller, Get, Post, Request, Res, UseGuards } from "@nestjs/common";
 import { AuthService } from "./auth.service";
 import { LocalAuthGuard } from "./local-suth.guard";
-
+import { GoogleAuthGuard } from './google-auth.guard'
 
 @Controller('auth')
 export class AuthController {
@@ -14,7 +14,7 @@ export class AuthController {
         // return access_token;
 
         //save to cookies
-        res.cookie('test', access_token, {
+        res.cookie('access_token', access_token, {
             httpOnly: true,
             sameSite: 'strict',
             secure: true,
@@ -22,6 +22,29 @@ export class AuthController {
         }); //ทำให้javascrip pull cookies ตรงๆไม่ได้
         return 'Login Successful';
     }
+
+    @Get('google')
+    @UseGuards(GoogleAuthGuard)
+    async googleAuth(@Request() req) {
+        // Initiates the Google OAuth process
+    }
+
+    @Get('google/callback')
+    @UseGuards(GoogleAuthGuard)
+    async googleAuthRedirect(@Request() req, @Res() res) {
+        const { accessToken } = await this.authService.googleLogin(req);
+        res.cookie('access_token', accessToken, {
+            httpOnly: true, //httpOnly cookie ถูกป้องกันไม่ให้ JavaScript หรือ DevTools อ่านหรือแก้ไขโดยตรง (เพื่อความปลอดภัย
+            sameSite: 'lax',
+            secure: false,
+            path: '/',
+        });
+        res.redirect('/user/profile');
+        // return 'Login Sucessfully';
+        // return;
+    }
+
+
 
 
 }

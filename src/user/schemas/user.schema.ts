@@ -9,11 +9,14 @@ export class User {
   @Prop({ required: true, unique: true })
   email: string;
 
-  @Prop({ required: true })
+  @Prop() //use google email
   password: string;
 
   @Prop({ required: true })
   name: string;
+
+  @Prop({ required: true })
+  googleId: string;
 
 }
 

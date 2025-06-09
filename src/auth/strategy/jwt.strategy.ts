@@ -23,10 +23,11 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
         super({
             jwtFromRequest: ExtractJwt.fromExtractors([
                 (request: Request & { cookies?: Record<string, string> }) => {
-                    const raw = request?.cookies?.test;
+                    const raw = request?.cookies?.access_token;
+                    console.log('raw ===', raw);
                     console.log('raw.access_token ===', raw.access_token);
 
-                    return raw.access_token || null;
+                    return raw || null;
                 },
             ]),
             ignoreExpiration: false,

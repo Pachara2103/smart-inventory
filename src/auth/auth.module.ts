@@ -9,6 +9,10 @@ import { JwtAuthGuard } from "./jwt-auth.guard";
 import { JwtModule } from "@nestjs/jwt";
 import { JwtStrategy } from "./strategy/jwt.strategy";
 import { ConfigModule, ConfigService } from "@nestjs/config";
+import { GoogleAuthGuard } from "./google-auth.guard";
+import { GoogleStrategy } from "./strategy/google.strategy";
+import { MongooseModule } from '@nestjs/mongoose';
+import { User, UserSchema } from '../user/schemas/user.schema';
 
 
 
@@ -24,9 +28,10 @@ import { ConfigModule, ConfigService } from "@nestjs/config";
                 signOptions: { expiresIn: '60s' },
             }),
         }),
+        // MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
 
     ],
     controllers: [AuthController],
-    providers: [AuthService, LocalAuthGuard, LocalStrategy, JwtAuthGuard, JwtStrategy],
+    providers: [AuthService, LocalAuthGuard, LocalStrategy, JwtAuthGuard, JwtStrategy, GoogleAuthGuard, GoogleStrategy],
 })
 export class AuthModule { }

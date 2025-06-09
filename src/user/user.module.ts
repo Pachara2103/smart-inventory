@@ -17,6 +17,6 @@ import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
   ],
   controllers: [UserController],
   providers: [UserService, JwtAuthGuard],
-  exports:[UserService]
+  exports:[UserService, MongooseModule]
 })
 export class UserModule {}
