@@ -11,34 +11,78 @@
 #ศึกษาวิธีทำ Login register with Nestjs & using mongo  from Youtube Channel  testing API by using postman
 #ศึกษาการใช้ vue frontend
 
-<div> โครงสร้าง </div>
-   <div> smart-inventory</div>
-├── frontend/          # Vue.js
-├── backend/       # NestJS
-├── helm-chart/        # if needed
-├── terraform/         # if needed
-├── docker-compose.yml 
-└── README.md
+โครงสร้างระบบ (Vue + NestJS + MongoDB)
+Frontend (Vue.js)
+ -Login Page	    เข้าสู่ระบบด้วย username/password
+ -Dashboard	        สรุปจำนวนสินค้า, กราฟสต็อก
+ -Product List	    ดูรายการสินค้า, กดดูรายละเอียด
+ -Add/Edit Product	เพิ่มหรือแก้ไขข้อมูลสินค้า
+ -Stock Movement	บันทึกการเติม/เบิกสินค้า
+ -Movement History	ดูประวัติการเคลื่อนไหวของสินค้า
+ -User Management 	จัดการบัญชีพนักงาน(เฉพาะ Admin)
+ -Profile / Logout	ข้อมูลส่วนตัว
 
-   <div> Frontend <ฝdiv>   
-├── views/
-│   ├── LoginView.vue
-│   ├── DashboardView.vue
-│   ├── ProductsView.vue
-│   └── TransactionsView.vue
+Backend (NestJS)
+auth	    /auth/login	        เข้าสู่ระบบ
+users	    /users	            จัดการผู้ใช้ (admin-only)
+products    /products	        CRUD สินค้า
+stock	    /stock/add,remove	เติม/เบิกสินค้า
+history	    /history	        ดูประวัติ stock movement
+dashboard	/dashboard/summary	แสดงจำนวนสินค้า, ยอดรวม
+
+MongoDB
+- users
+  - _id
+  - username
+  - passwordHash
+  - role: 'admin' | 'staff'
+
+- products
+  - _id
+  - name
+  - sku
+  - quantity
+  - unit
+  - description
+
+- stock_movements
+  - _id
+  - product_id
+  - type: 'add' | 'remove'
+  - amount
+  - note
+  - created_by
+  - created_at
+
+
+Frontend
+src/
 ├── components/
-│   └── ProductForm.vue
+├── pages/
+│   ├── Login.vue
+│   ├── Dashboard.vue
+│   ├── ProductList.vue
+│   ├── ProductForm.vue
+│   ├── StockMovement.vue
+│   ├── History.vue
+│   └── UserManagement.vue
 ├── router/
-│   └── index.ts
-├── stores/
-│   └── userStore.ts
-└── services/
-    └── api.ts (axios instance)
-   <div> Backend </div>
+├── store/
+├── services/  # เรียก API
+└── App.vue
 
-├── auth/          # ระบบ auth, JWT
-├── users/         # ผู้ใช้งาน
-├── products/      # สินค้า
-├── transactions/  # ประวัติการเบิก/เพิ่ม
-├── common/        # Guard, Interceptor, DTO แชร์
+Backend
+src/
+├── auth/
+│   ├── auth.controller.ts
+│   ├── auth.service.ts
+│   └── jwt.strategy.ts
+├── users/
+├── products/
+├── stock/
+├── history/
+├── dashboard/
+├── common/  # guards, interceptors, decorators
 ├── app.module.ts
+└── main.ts
+
