@@ -37,13 +37,16 @@ MongoDB
   - passwordHash
   - role: 'admin' | 'staff'
 
-- products
-  - _id
-  - name
-  - sku
+- products 
+  - sku : unique ex.PT001
+  - name + picture
+  - category 
   - quantity
-  - unit
-  - description
+  - unit : kg, pieace
+  - price
+  - add by
+  + edit, delete
+  ///add time, expire
 
 - stock_movements
   - _id
