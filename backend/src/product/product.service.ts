@@ -4,14 +4,12 @@ import { ProductDto } from './dto/product.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { History, HistoryDocument } from 'src/schemas/history.schema';
-import { User, UserDocument } from 'src/schemas/user.schema';
 
 @Injectable()
 export class ProductService {
     constructor(
         @InjectModel(Product.name) private readonly productModel: Model<ProductDocument>,
         @InjectModel(History.name) private readonly historyModel: Model<HistoryDocument>,
-        // @InjectModel(User.name) private readonly userModel: Model<UserDocument>,
 
     ) { }
 
@@ -49,21 +47,44 @@ export class ProductService {
 
         return products;
     }
-    async updateQuantity(sku: string, amount: number, description: string) {
-        // หา product ด้วย SKU
+
+
+    async selectCategory(category: string) {
+        const products = await this.productModel.find({ category: category });
+        return products;
+    }
+
+    async updateQuantity(sku: string, amount: number, description: string, type: string, user: string) {
         const product = await this.productModel.findOne({ sku });
-
-        const history = new this.historyModel({ sku: sku, quantity: product?.quantity, description: description, action: `Add,${amount}` });
-        await history.save();
-
         if (!product) {
             throw new Error('Product not found');
         }
-        const currentQty = product.quantity;
-        product.quantity = currentQty + amount;
+        const history = new this.historyModel({
+            sku: sku,
+            name: product.name,
+            category: product.category,
+            quantity: amount,
+            unit: product.unit,
+            description: description,
+            action: type,
+            user:user
+        });
 
+        await history.save();
+
+        if (product.quantity - amount && type === "Req") {
+            return "not enough quantity"
+        }
+        product.quantity = type === "Add" ? product.quantity + amount : product.quantity - amount;
 
         await product.save();
         return product;
     }
+    async getSaleProduct() {
+        const sale = await this.historyModel.find({ action: "Req"});
+        console.log("call sale")
+        return sale;
+    }
+
+    
 }

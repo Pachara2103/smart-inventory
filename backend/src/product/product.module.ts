@@ -16,10 +16,6 @@ import { User, UserSchema } from 'src/schemas/user.schema';
       name: History.name,
       schema: HistorySchema
     }]),
-    MongooseModule.forFeature([{
-      name: User.name,
-      schema: UserSchema
-    }])
 
   ],
 

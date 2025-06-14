@@ -5,6 +5,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { extname, join } from 'path';
 import { diskStorage } from 'multer';
 import { Express } from 'express';
+import { AnyTxtRecord } from 'dns';
 
 
 @Controller('product')
@@ -73,10 +74,25 @@ export class ProductController {
         return this.productService.sortByDate(sortdate);
     }
 
+    @Get('selectcategory')
+    async selectCategory(@Query('category') category: string) {
+        return this.productService.selectCategory(category);
+    }
+     @Get('sale')
+    async saleProduct(@Query()r: any) {
+        return this.productService.getSaleProduct();
+    }
+
     @Post('add')
-    async addQuantity(@Body() body: { sku: string; amount: number; description: string }) {
-        console.log(body); 
-        
-        return {msg:'add successfully', add: await this.productService.updateQuantity(body.sku, body.amount, body.description)};
+    async addQuantity(@Body() body: { sku: string; amount: number; description: string, user: string }) {
+        console.log(body);
+
+        return { msg: 'add successfully', add: await this.productService.updateQuantity(body.sku, body.amount, body.description, "Add", body.user) };
+    }
+
+    @Post('req')
+    async reqProduct(@Body() body: { sku: string; amount: number; description: string, user: string }) {
+
+        return { msg: 'req successfully', req: await this.productService.updateQuantity(body.sku, body.amount, body.description, "Req", body.user) };
     }
 }

@@ -1,24 +1,80 @@
 <script setup>
-import { ref, onMounted, watch } from 'vue'
+import { ref, onMounted, watch, computed } from 'vue'
 import axios from 'axios'
-import { Pie } from 'vue-chartjs'
+import { Pie , Bar} from 'vue-chartjs'
+
 import {
   Chart,
   Title,
   Tooltip,
   Legend,
-  ArcElement
+  ArcElement,
+
+  BarElement,
+  CategoryScale,
+  LinearScale
 } from 'chart.js'
-Chart.register(Title, Tooltip, Legend, ArcElement)
+Chart.register(Title, Tooltip, Legend, ArcElement, BarElement, CategoryScale, LinearScale)
 
 const AllProduct = ref([])
+
+const ProductByCategory = ref([])
+const category = ref('Fruit')
+
+const sale = ref([])
+
+const saleChart = computed(() => ({
+  labels: sale.value.map(s => s.name),
+  datasets: [
+    {
+      label: 'Quantity Sold',
+      backgroundColor: '#42b983',
+      data: sale.value.map(s => s.quantity)
+    }
+  ]
+}))
+
+const saleChartOptions = {
+  responsive: true,
+  plugins: {
+    legend: { position: 'top' },
+    title: {
+      display: true,
+      text: 'Sales Column Chart'
+    }
+  }
+}
+
+
 const sortdate = ref(true);
-const chartData = ref({
-  labels: [],
+
+onMounted(async () => {
+  try {
+    const response = await axios.get('http://localhost:3000/product/getallproduct')
+    // ProductByCategory.value = response.data
+    SelectCategory()
+    AllProduct.value = response.data
+
+  } catch (error) {
+    console.error('Error fetching products:', error)
+  }
+
+  try {
+    const response = await axios.get('http://localhost:3000/product/sale')
+    // ProductByCategory.value = response.data
+    sale.value = response.data
+    console.error('sale:', sale.value)
+
+  } catch (error) {
+    console.error('Error fetching sale:', error)
+  }
+});
+const chartData = computed(() => ({
+  labels: ProductByCategory.value.map(p => p.name),
   datasets: [
     {
       label: 'Quantity',
-      data: [],
+      data: ProductByCategory.value.map(p => parseFloat(p.quantity)),
       backgroundColor: [
         '#FF6384',
         '#36A2EB',
@@ -29,25 +85,8 @@ const chartData = ref({
       ],
     },
   ],
-})
+}));
 
-
-onMounted(async () => {
-  try {
-    const response = await axios.get('http://localhost:3000/product/getallproduct')
-    AllProduct.value = response.data
-    console.log('All product = ', AllProduct._rawValue)
-
-    chartData.value.labels = AllProduct.value.map(p => p.name)
-    chartData.value.datasets[0].data = AllProduct.value.map(p => parseFloat(p.quantity))
-
-    console.log('chartData = ', chartData)
-
-
-  } catch (error) {
-    console.error('Error fetching products:', error)
-  }
-});
 const chartOptions = ref({
   responsive: true,
   maintainAspectRatio: false,
@@ -79,11 +118,29 @@ const chartOptions = ref({
 
 
 const sortbydate = async () => {
+  sortdate.value = !sortdate.value;
+  console.log('press sort button= ', sortdate.value)
   const response = await axios.get('http://localhost:3000/product/sortproduct', {
     params: { sortdate: sortdate.value }
   })
   AllProduct.value = response.data
 }
+
+const SelectCategory = async () => {
+  console.log('select category= ', category.value)
+  const response = await axios.get('http://localhost:3000/product/selectcategory', {
+    params: {
+      category: category.value
+    }
+  })
+  ProductByCategory.value = response.data
+  console.log('ProductByCategory.value= ', ProductByCategory.value)
+}
+
+watch(() => category.value, () => {
+  SelectCategory()
+  console.log('call select category')
+})
 
 
 
@@ -103,6 +160,8 @@ const sortbydate = async () => {
     <div class="col2">
       <div class="added">
         <label> Recently Added Product</label>
+
+
         <table class="product-table">
           <thead>
             <tr>
@@ -112,15 +171,32 @@ const sortbydate = async () => {
               <th>Price</th>
             </tr>
           </thead>
-          <tbody>
-            <tr v-for="(product, index) in AllProduct" :key="product._id">
-              <td>{{ index + 1 }}</td>
-              <td>{{ product.sku }}</td>
-              <td>{{ product.name }}</td>
-              <td>{{ product.price }}</td>
-            </tr>
-          </tbody>
         </table>
+
+        <div
+          style=" height: 30vh; overflow-y: auto; ::-webkit-scrollbar{display: none;}   scrollbar-width: none; -ms-overflow-style: none; ">
+          <table class="product-table">
+            <tbody>
+              <tr v-for="(product, index) in AllProduct" :key="product._id">
+                <td>{{ index + 1 }}</td>
+                <td>{{ product.sku }}</td>
+                <td>{{ product.name }}</td>
+                <td>{{ product.price }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+
+        <div style="position: absolute; top:0; right: 0;">
+          <button @click="sortbydate()"> sortbydate</button>
+          <label v-if="sortdate"> true</label>
+          <label v-else> false</label>
+
+        </div>
+
+
+
 
       </div>
 
@@ -132,7 +208,25 @@ const sortbydate = async () => {
             :options="chartOptions" />
           <p v-else>Loading chart...</p>
         </div>
+
+        <select v-model="category">
+          <option disabled value="">category</option>
+          <option value="Fruit">Fruit</option>
+          <option value="Mobile">Mobile</option>
+        </select>
+
+
       </div>
+
+      <div class="sale">
+
+        <div style="width: 90%; height: 90%; position: relative;">
+          <label>detail</label>
+          <Bar :data="saleChart" :options="saleChartOptions" />
+        </div>
+
+      </div>
+
 
 
     </div>
@@ -179,13 +273,14 @@ const sortbydate = async () => {
 }
 
 .added {
+  position: relative;
   background-color: white;
   width: 30%;
   height: 40vh;
-  overflow-y: auto;
 }
 
 .circle-graph {
+  position: relative;
   background-color: rgb(250, 220, 220);
   width: 30%;
   height: 40vh;
@@ -197,17 +292,38 @@ const sortbydate = async () => {
   /* margin: auto; */
 }
 
+.sale {
+  position: relative;
+
+  background-color: rgb(255, 255, 255);
+  width: 30%;
+  height: 40vh;
+  padding: 20px;
+
+}
+
 .product-table {
   width: 100%;
   border-collapse: collapse;
-  margin-top: 20px;
+  /* margin-top: 20px; */
+  /* table-layout: fixed;  */
 }
 
-.product-table th,
+.product-table::-webkit-scrollbar {
+  display: none;
+  /* Chrome, Safari */
+}
+
+.product-table th {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: center;
+}
+
 .product-table td {
   border: 1px solid #ddd;
   padding: 8px;
-  text-align: left;
+  text-align: center;
 }
 
 .product-table th {
@@ -220,5 +336,18 @@ const sortbydate = async () => {
 
 .product-table tr:hover {
   background-color: #e6f7ff;
+}
+
+.circle-graph select {
+  width: auto;
+  padding: 5px 5px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  outline: none;
+  position: absolute;
+  top: 10px;
+  right: 10px;
+
+  /* margin-top: 10px; */
 }
 </style>

@@ -6,7 +6,7 @@ import searchIcon from '@/images/icons/search.png'
 
 const AllProduct = ref([])
 const searchQuery = ref('')
-
+const User = ref({});
 const activeRow = ref(null) // บอกว่า row ไหนเปิด popover อยู่
 const popoverData = reactive({
   amount: 0,
@@ -16,6 +16,17 @@ const popoverData = reactive({
 
 
 onMounted(async () => {
+  try {
+    const getUser = await axios.get('http://localhost:3000/user/profile', {
+      withCredentials: true // send cookies
+    })
+    User.value = getUser.data
+    console.log('User.value = ', User.value)
+
+  } catch (error) {
+    console.error('Error fetching products:', error)
+  }
+
   try {
     const response = await axios.get('http://localhost:3000/product/getallproduct')
     AllProduct.value = response.data
@@ -67,12 +78,25 @@ const submitAdd = async (product) => {
       sku: product.sku,
       amount: popoverData.amount,
       description: popoverData.description,
+      user: User.value.name
     })
     console.log('Add success:', response.data)
-     console.log('response', response.data)
 
-    // อัปเดตใน frontend ทันที
-    // product.quantity = response.data.quantity
+    closePopover()
+  } catch (err) {
+    console.error('Error adding:', err)
+  }
+}
+
+const submitReq = async (product) => {
+  try {
+    const response = await axios.post('http://localhost:3000/product/req', {
+      sku: product.sku,
+      amount: popoverData.amount,
+      description: popoverData.description,
+      user: User.value.name
+    })
+    console.log('Req success:', response.data)
 
     closePopover()
   } catch (err) {
@@ -128,6 +152,17 @@ const submitAdd = async (product) => {
               <button @click="submitAdd(product)">Submit</button>
               <button @click="closePopover()" style="margin-left: 5px;">Cancel</button>
             </div>
+
+            <!-- <div v-if="activeRow === index" class="popover">
+              <label>Amount:</label>
+              <input type="number" v-model="popoverData.amount" />
+
+              <label>Description:</label>
+              <input type="text" v-model="popoverData.description" />
+
+              <button @click="submitAdd(product)">Submit</button>
+              <button @click="closePopover()" style="margin-left: 5px;">Cancel</button>
+            </div> -->
           </td>
         </tr>
       </tbody>

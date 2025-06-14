@@ -12,29 +12,30 @@ export class History {
     @Prop({ required: true }) //generate
     sku: string;
 
-    // @Prop({ required: true })
-    // name: string;
+    @Prop({ required: true })
+    name: string;
 
-    // @Prop({ required: true })
-    // category: string;
+    @Prop({ required: true })
+    category: string;
 
     @Prop({ required: true })
     quantity: number;
 
-    // @Prop({ required: true })
-    // unit: string;
+    @Prop({ required: true })
+    unit: string;
 
     // @Prop({ required: true })
     // price: string;
 
-    @Prop({ required: true })
+    @Prop()
     description: string;
 
     @Prop({ required: true })
     action: string;
 
-    // @Prop()
-    // addBy: string;
+    @Prop()
+    user: string;
+
 
 }
 export const HistorySchema = SchemaFactory.createForClass(History);
