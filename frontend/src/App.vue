@@ -1,9 +1,8 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { RouterLink, RouterView, useRoute } from 'vue-router'
-import dashboardIcon from '@/images/icons/dashboard.png'
-import dashboardIcon2 from '@/images/icons/dashboard.svg'
 import productIcon from '@/images/icons/product.png'
+
 
 
 const route = useRoute()
@@ -24,11 +23,6 @@ function handleClick(tabName) {
   } else {
     isProductOpen.value = false
   }
-  // watch(() => route.path, (newPath) => {
-  //   if (!newPath.startsWith('/Product')) {
-  //     isProductOpen.value = false
-  //   }
-  // })
 
 }
 </script>
@@ -40,8 +34,9 @@ function handleClick(tabName) {
       <RouterLink to="/Dashboard" class="tab-box" :class="{ active: activeTab === 'dashboard' }"
         @click="handleClick('dashboard')">
 
-        <svg class="icon" :class="{ active: activeTab === 'dashboard' }"  viewBox="-5 -5 35 35">
-          <path d="M 23.9 11.437 A 12 12 0 0 0 0 13 a 11.878 11.878 0 0 0 3.759 8.712 A 4.84 4.84 0 0 0 7.113 23 H 16.88 a 4.994 4.994 0 0 0 3.509 -1.429 A 11.944 11.944 0 0 0 23.9 11.437 Z m -4.909 8.7 A 3 3 0 0 1 16.88 21 H 7.113 a 2.862 2.862 0 0 1 -1.981 -0.741 A 9.9 9.9 0 0 1 2 13 A 10.014 10.014 0 0 1 5.338 5.543 A 9.881 9.881 0 0 1 11.986 3 a 10.553 10.553 0 0 1 1.174 0.066 a 9.994 9.994 0 0 1 5.831 17.076 Z M 7.807 17.285 a 1 1 0 0 1 -1.4 1.43 A 8 8 0 0 1 12 5 a 8.072 8.072 0 0 1 1.143 0.081 a 1 1 0 0 1 0.847 1.133 a 0.989 0.989 0 0 1 -1.133 0.848 a 6 6 0 0 0 -5.05 10.223 Z m 12.112 -5.428 A 8.072 8.072 0 0 1 20 13 a 7.931 7.931 0 0 1 -2.408 5.716 a 1 1 0 0 1 -1.4 -1.432 a 5.98 5.98 0 0 0 1.744 -5.141 a 1 1 0 0 1 1.981 -0.286 Z m -5.993 0.631 a 2.033 2.033 0 1 1 -1.414 -1.414 l 3.781 -3.781 a 1 1 0 1 1 1.414 1.414 Z" />
+        <svg class="icon" :class="{ active: activeTab === 'dashboard' }" viewBox="-5 -5 35 35">
+          <path
+            d="M 23.9 11.437 A 12 12 0 0 0 0 13 a 11.878 11.878 0 0 0 3.759 8.712 A 4.84 4.84 0 0 0 7.113 23 H 16.88 a 4.994 4.994 0 0 0 3.509 -1.429 A 11.944 11.944 0 0 0 23.9 11.437 Z m -4.909 8.7 A 3 3 0 0 1 16.88 21 H 7.113 a 2.862 2.862 0 0 1 -1.981 -0.741 A 9.9 9.9 0 0 1 2 13 A 10.014 10.014 0 0 1 5.338 5.543 A 9.881 9.881 0 0 1 11.986 3 a 10.553 10.553 0 0 1 1.174 0.066 a 9.994 9.994 0 0 1 5.831 17.076 Z M 7.807 17.285 a 1 1 0 0 1 -1.4 1.43 A 8 8 0 0 1 12 5 a 8.072 8.072 0 0 1 1.143 0.081 a 1 1 0 0 1 0.847 1.133 a 0.989 0.989 0 0 1 -1.133 0.848 a 6 6 0 0 0 -5.05 10.223 Z m 12.112 -5.428 A 8.072 8.072 0 0 1 20 13 a 7.931 7.931 0 0 1 -2.408 5.716 a 1 1 0 0 1 -1.4 -1.432 a 5.98 5.98 0 0 0 1.744 -5.141 a 1 1 0 0 1 1.981 -0.286 Z m -5.993 0.631 a 2.033 2.033 0 1 1 -1.414 -1.414 l 3.781 -3.781 a 1 1 0 1 1 1.414 1.414 Z" />
         </svg>
         <label> Dashboard</label>
       </RouterLink>
@@ -55,14 +50,19 @@ function handleClick(tabName) {
 
       <div v-if="isProductOpen" class="sub-menu">
         <RouterLink to="/Product/Add" class="sub-tab">- Add Product</RouterLink>
-      </div> 
+      </div>
 
-      <!-- <RouterLink to="/Product" class="tab-box" :class="{ active: activeTab === 'product' }"
-        @click="handleClick('product')">
-        <img :src="productIcon" width="24" height="24" />
-        <label> Product</label>
-        <span style="margin-left:auto">{{ isProductOpen ? '▼' : '>' }}</span>
-      </RouterLink> -->
+      <RouterLink to="/History" class="tab-box" :class="{ active: activeTab === 'history' }"
+        @click="handleClick('history')">
+        <svg class="icon" :class="{ active: activeTab === 'history' }" viewBox="-5 -5 35 35">
+          <path
+            d="M 12 0 A 11.972 11.972 0 0 0 4 3.073 V 1 A 1 1 0 0 0 2 1 V 4 A 3 3 0 0 0 5 7 H 8 A 1 1 0 0 0 8 5 H 5 a 0.854 0.854 0 0 1 -0.1 -0.021 A 9.987 9.987 0 1 1 2 12 a 1 1 0 0 0 -2 0 A 12 12 0 1 0 12 0 Z" />
+          <path 
+            d="M12,6a1,1,0,0,0-1,1v5a1,1,0,0,0,.293.707l3,3a1,1,0,0,0,1.414-1.414L13,11.586V7A1,1,0,0,0,12,6Z" />
+        </svg> <label> History</label>
+
+      </RouterLink>
+
     </nav>
 
     <RouterView />
@@ -90,11 +90,12 @@ function handleClick(tabName) {
 }
 
 .container {
- /* flex: 1; */
+  /* flex: 1; */
   flex-direction: row;
+  /* display: flex; */
   /* height: 100vh; */
   margin-left: 225px;
-  background-color: aqua;
+  background-color: rgb(255, 241, 234);
 }
 
 .tab {

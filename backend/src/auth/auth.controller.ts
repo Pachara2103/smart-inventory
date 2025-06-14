@@ -33,6 +33,7 @@ export class AuthController {
     @UseGuards(GoogleAuthGuard)
     async googleAuthRedirect(@Request() req, @Res() res) {
         const { accessToken } = await this.authService.googleLogin(req);
+        console.log('call google/callback access = ', accessToken)
         res.cookie('access_token', accessToken, {
             httpOnly: true, //httpOnly cookie ถูกป้องกันไม่ให้ JavaScript หรือ DevTools อ่านหรือแก้ไขโดยตรง (เพื่อความปลอดภัย
             sameSite: 'lax',
@@ -40,6 +41,8 @@ export class AuthController {
             path: '/',
         });
         res.redirect('http://localhost:5173/Dashboard');
+        // res.redirect('/user/profile');
+
         // return 'Login Sucessfully';
         // return;
     }

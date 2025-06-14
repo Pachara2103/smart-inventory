@@ -1,11 +1,18 @@
 <script setup>
-import { ref, onMounted, watch } from 'vue'
+import { ref, onMounted, reactive } from 'vue'
 import axios from 'axios'
 import searchIcon from '@/images/icons/search.png'
 
 
 const AllProduct = ref([])
 const searchQuery = ref('')
+
+const activeRow = ref(null) // บอกว่า row ไหนเปิด popover อยู่
+const popoverData = reactive({
+  amount: 0,
+  description: '',
+})
+
 
 
 onMounted(async () => {
@@ -19,19 +26,6 @@ onMounted(async () => {
   }
 });
 
-// watch(searchQuery, async (newQuery) => {
-//    console.log('aaaaaaaaaaaaaaaaa');
-//   try {
-//     const res = await axios.get('http://localhost:3000/product/getproduct', {
-//       params: {
-//         q: newQuery // ส่งเป็น ?q=value
-//       }
-//     })
-//     AllProduct.value = res.data
-//   } catch (err) {
-//     console.error(err)
-//   }
-// });
 const handleSearch = async () => {
   console.log('search= ', searchQuery.value);
   if (!searchQuery.value) {
@@ -56,6 +50,36 @@ const handleSearch = async () => {
 
 }
 
+const openPopover = (index) => {
+  console.log('Add press')
+  activeRow.value = index
+  popoverData.amount = 0
+  popoverData.description = ''
+}
+
+const closePopover = () => {
+  activeRow.value = null
+}
+
+const submitAdd = async (product) => {
+  try {
+    const response = await axios.post('http://localhost:3000/product/add', {
+      sku: product.sku,
+      amount: popoverData.amount,
+      description: popoverData.description,
+    })
+    console.log('Add success:', response.data)
+     console.log('response', response.data)
+
+    // อัปเดตใน frontend ทันที
+    // product.quantity = response.data.quantity
+
+    closePopover()
+  } catch (err) {
+    console.error('Error adding:', err)
+  }
+}
+
 </script>
 
 <template>
@@ -78,20 +102,33 @@ const handleSearch = async () => {
           <th>Unit</th>
           <th>Price</th>
           <th>Add By</th>
+          <th>Action</th>
         </tr>
       </thead>
       <tbody>
-        <tr v-for="product in AllProduct" :key="product.sku">
-          <td class="product-name">
-            <!-- <img src="@/assets/a.png" alt="product icon" /> -->
-            {{ product.name }}
-          </td>
+        <tr v-for="(product, index) in AllProduct" :key="index">
+          <td>{{ product.name }}</td>
           <td>{{ product.sku }}</td>
           <td>{{ product.category }}</td>
           <td>{{ product.quantity }}</td>
           <td>{{ product.unit }}</td>
           <td>{{ product.price }}</td>
           <td>{{ product.addBy }}</td>
+          <td>
+            <button @click="openPopover(index)">ADD</button>
+            <button style="margin-left: 10px;">REQ</button>
+
+            <div v-if="activeRow === index" class="popover">
+              <label>Amount:</label>
+              <input type="number" v-model="popoverData.amount" />
+
+              <label>Description:</label>
+              <input type="text" v-model="popoverData.description" />
+
+              <button @click="submitAdd(product)">Submit</button>
+              <button @click="closePopover()" style="margin-left: 5px;">Cancel</button>
+            </div>
+          </td>
         </tr>
       </tbody>
     </table>
@@ -101,7 +138,8 @@ const handleSearch = async () => {
 <style scoped>
 .product-container {
   max-width: 900px;
-  margin: 2rem auto;
+  /* margin: 2rem auto; */
+  display: flex;
   flex-direction: column;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   background-color: aqua;
@@ -131,6 +169,7 @@ h2 {
   margin-top: 20px;
   /* ขอบตาราง */
 
+
 }
 
 .product-table thead {
@@ -140,6 +179,7 @@ h2 {
 
 .product-table th,
 .product-table td {
+  position: relative;
   padding: 12px 15px;
   text-align: left;
   border-bottom: 1px solid #ddd;
@@ -164,5 +204,24 @@ h2 {
   height: 24px;
   object-fit: contain;
   border-radius: 4px;
+}
+
+.popover {
+  position: absolute;
+  top: 100%;
+  /* ใต้ปุ่ม */
+  left: 1;
+  background: #fff;
+  border: 1px solid #ddd;
+  padding: 10px;
+  z-index: 100;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  margin-top: 5px;
+}
+
+.popover input {
+  display: block;
+  margin: 5px 0;
+  width: 120px;
 }
 </style>

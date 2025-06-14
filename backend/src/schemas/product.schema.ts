@@ -3,7 +3,11 @@ import { Document, Model } from 'mongoose';
 
 export type ProductDocument = Product & Document;
 
-@Schema()
+@Schema({ timestamps: true })
+// createdAt
+// 2025-06-13T03:27:35.331+00:00
+// updatedAt
+// 2025-06-13T03:27:35.331+00:00
 export class Product {
     @Prop({ unique: true }) //generate
     sku: string;
@@ -15,7 +19,7 @@ export class Product {
     category: string;
 
     @Prop({ required: true })
-    quantity: string;
+    quantity: number;
 
     @Prop({ required: true })
     unit: string;

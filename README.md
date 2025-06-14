@@ -64,8 +64,8 @@ src/
 ├── pages/
 │   ├── Login.vue
 │   ├── Dashboard.vue
-│   ├── ProductList.vue
-│   ├── ProductForm.vue
+│   ├── Product.vue
+│   ├── AddProduct.vue
 │   ├── StockMovement.vue
 │   ├── History.vue
 │   └── UserManagement.vue

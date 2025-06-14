@@ -3,7 +3,7 @@ import { ref, onMounted, watch } from 'vue'
 import axios from 'axios'
 import upload from '@/images/icons/upload.png'
 
-
+const User = ref({});
 const product = ref({
     sku: '',
     name: '',
@@ -13,9 +13,21 @@ const product = ref({
     price: '',
     addBy: ''
 })
-// onMounted(async () => {
 
-// });
+
+onMounted(async () => {
+    try {
+        const getUser = await axios.get('http://localhost:3000/user/profile', {
+            withCredentials: true // send cookies
+        })
+        User.value = getUser.data
+        console.log('User.value = ',  User.value)
+
+    } catch (error) {
+        console.error('Error fetching products:', error)
+    }
+});
+
 watch(() => product.value.category, (newCategory) => {
     console.log('category', newCategory);
 
@@ -39,7 +51,7 @@ function onFileChange(e) {
     const file = e.target.files[0]
     if (file && file.type.startsWith('image/')) {
         uploadImage.value = URL.createObjectURL(file)
-        ImagetoStore.value= file
+        ImagetoStore.value = file
     } else {
         uploadImage.value = null
     }
@@ -63,10 +75,10 @@ async function sendData() {
         formData.append('addBy', product.value.addBy)
 
         if (uploadImage.value) {
-            formData.append('image',  ImagetoStore.value) // 'image' ต้องตรงกับ NestJS FileInterceptor
+            formData.append('image', ImagetoStore.value) // 'image' ต้องตรงกับ NestJS FileInterceptor
         }
 
-        const res = await axios.post('http://localhost:3000/product/add', formData)
+        const res = await axios.post('http://localhost:3000/product/creat', formData)
 
         console.log('Upload success', res.data)
         console.log('formData= ', formData)
@@ -152,7 +164,7 @@ async function sendData() {
             <div>
                 <label>Added By</label>
                 <div>
-                    <input type="text" v-model="product.addBy" />
+                    <input type="text" v-model="User.name" readonly />
                 </div>
 
             </div>
@@ -304,6 +316,7 @@ async function sendData() {
     margin-left: 60px;
     margin-top: 5px;
 }
+
 .image-upload button:hover {
     color: #dfe23f;
 }
@@ -317,6 +330,7 @@ async function sendData() {
     margin-left: 60px;
     margin-top: 5px;
 }
+
 .add-button:hover {
     border-color: #dfe23f;
     color: #f6ff00;

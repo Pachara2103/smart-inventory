@@ -12,7 +12,7 @@ export class ProductController {
     constructor(
         private readonly productService: ProductService,
     ) { }
-    @Post('add')
+    @Post('creat')
     @UseInterceptors(
         FileInterceptor('image', {
             storage: diskStorage({
@@ -41,7 +41,7 @@ export class ProductController {
         productDto.imgPath = file ? file.filename : null;
         console.log(join(process.cwd(), '/src/images'));
 
-        return this.productService.addProduct(productDto);
+        return this.productService.creatProduct(productDto);
     }
 
 
@@ -66,5 +66,17 @@ export class ProductController {
             console.log('filter:', filter);
             return this.productService.getProduct(filter);
         }
+    }
+
+    @Get('sortproduct')
+    async sortProduct(@Query('sortdate') sortdate: string) {
+        return this.productService.sortByDate(sortdate);
+    }
+
+    @Post('add')
+    async addQuantity(@Body() body: { sku: string; amount: number; description: string }) {
+        console.log(body); 
+        
+        return {msg:'add successfully', add: await this.productService.updateQuantity(body.sku, body.amount, body.description)};
     }
 }
