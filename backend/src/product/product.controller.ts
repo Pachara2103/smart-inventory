@@ -17,7 +17,7 @@ export class ProductController {
     @UseInterceptors(
         FileInterceptor('image', {
             storage: diskStorage({
-                destination: join(process.cwd(), '/src/images'), // โฟลเดอร์เก็บไฟล์ (ต้องสร้างโฟลเดอร์นี้ไว้)
+                destination: join(process.cwd(), '/images'), // โฟลเดอร์เก็บไฟล์ (ต้องสร้างโฟลเดอร์นี้ไว้)
                 filename: (req, file, callback) => {
                     const ext = extname(file.originalname);
                     const sku = req.body.sku || 'unknown';  // ดึงจาก formData
@@ -38,13 +38,11 @@ export class ProductController {
         @UploadedFile() file: Express.Multer.File,
         @Body() productDto: ProductDto,
     ) {
-        console.log('Uploaded file info:', file);
+        console.log('Uploaded file info:', file.filename);
         productDto.imgPath = file ? file.filename : null;
-        console.log(join(process.cwd(), '/src/images'));
 
         return this.productService.creatProduct(productDto);
     }
-
 
     @Get('getallproduct')
     getAllProduct(@Request() req) {
@@ -70,8 +68,10 @@ export class ProductController {
     }
 
     @Get('sortproduct')
-    async sortProduct(@Query('sortdate') sortdate: string) {
-        return this.productService.sortByDate(sortdate);
+    async sortProduct(@Query('sortType') sortType: string, @Query('asc') asc: string){
+        // console.log(sortType, asc);
+        const Asc = asc==="true"?  true: false;
+        return this.productService.sortType(sortType, Asc);
     }
 
     @Get('selectcategory')

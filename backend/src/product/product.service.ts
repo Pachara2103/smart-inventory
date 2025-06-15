@@ -41,11 +41,23 @@ export class ProductService {
         return this.productModel.find(filter).exec();
     }
 
-    async sortByDate(sortdate: string) {
-        const isSortDate = sortdate === 'true';
-        const products = await this.productModel.find().sort({ createdAt: isSortDate ? -1 : 1 }); // -1 = ใหม่ไปเก่า, 1 = เก่าไปใหม่
-
-        return products;
+    async sortType(sortType: string, asc: boolean) {
+        if (sortType === "date") {
+            const products = await this.productModel.find().sort({ createdAt: asc ? -1 : 1 });
+            return products;
+        }
+        else if (sortType === "name") {
+            const products = await this.productModel.find().sort({ name:  asc ? -1 : 1 });
+            return products;
+        }
+        else if (sortType === "price") {
+            const products = await this.productModel.find().sort({ price:  asc ? 1 : -1 });
+            return products;
+        }else if (sortType === "sku") {
+            const products = await this.productModel.find().sort({ sku:  asc ? -1 : 1 });
+            return products;
+        }
+        return;
     }
 
 
@@ -67,7 +79,7 @@ export class ProductService {
             unit: product.unit,
             description: description,
             action: type,
-            user:user
+            user: user
         });
 
         await history.save();
@@ -81,10 +93,10 @@ export class ProductService {
         return product;
     }
     async getSaleProduct() {
-        const sale = await this.historyModel.find({ action: "Req"});
+        const sale = await this.historyModel.find({ action: "Req" });
         console.log("call sale")
         return sale;
     }
 
-    
+
 }

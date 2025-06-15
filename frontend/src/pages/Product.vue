@@ -108,7 +108,7 @@ const submitReq = async (product) => {
 
 <template>
   <div class="product-container">
-    <h2>All Products</h2>
+    <label style="font-size: 30px; padding-bottom: 20px;">All Products</label>
     <div class="search">
       <img :src="searchIcon" width=35 height=35 style="margin-right: 5px;">
       <input type="search" v-model="searchQuery" placeholder="search ex. sku:PROD000, name: anything"
@@ -131,7 +131,18 @@ const submitReq = async (product) => {
       </thead>
       <tbody>
         <tr v-for="(product, index) in AllProduct" :key="index">
-          <td>{{ product.name }}</td>
+          <td>
+            <div style="flex-direction: row; display: flex; justify-content: center; align-items: center; gap: 10px;">
+
+              <div style="width: 50px; height: 50px;">
+                <img :src="`http://localhost:3000/images/${product.imgPath}`" style="width: 100%; height: 100%;">
+              </div>
+
+              {{ product.name }}
+
+            </div>
+
+          </td>
           <td>{{ product.sku }}</td>
           <td>{{ product.category }}</td>
           <td>{{ product.quantity }}</td>
@@ -172,12 +183,12 @@ const submitReq = async (product) => {
 
 <style scoped>
 .product-container {
-  max-width: 900px;
-  /* margin: 2rem auto; */
+  width: auto;
+  ;
   display: flex;
   flex-direction: column;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background-color: aqua;
+  background-color: rgb(255, 153, 224);
   justify-content: center;
   align-items: center;
 }
@@ -185,25 +196,15 @@ const submitReq = async (product) => {
 .search {
   display: flex;
   justify-content: center;
-  background-color: aquamarine;
-}
-
-h2 {
-  text-align: center;
-  color: #333;
-  margin-bottom: 1rem;
+  background-color: rgb(7, 236, 160);
 }
 
 .product-table {
   width: 100%;
   border-collapse: collapse;
-  box-shadow: 0 2px 8px rgb(0 0 0 / 0.1);
   background-color: #fff;
   border: 1px solid #ccc;
-
   margin-top: 20px;
-  /* ขอบตาราง */
-
 
 }
 
@@ -212,13 +213,21 @@ h2 {
   color: white;
 }
 
-.product-table th,
+.product-table th {
+  padding: 12px 15px;
+  border-bottom: 1px solid #ddd;
+  border: 1px solid #ccc;
+  text-align: center;
+
+}
+
 .product-table td {
   position: relative;
   padding: 12px 15px;
-  text-align: left;
+  /* text-align: left; */
   border-bottom: 1px solid #ddd;
   border: 1px solid #ccc;
+  text-align: center;
   /* ขอบทุกเซลล์ */
 
 }

@@ -12,7 +12,7 @@ export class Product {
     @Prop({ unique: true }) //generate
     sku: string;
 
-    @Prop({ unique: true }) 
+    @Prop({ unique: true })
     name: string;
 
     @Prop({ required: true })
@@ -29,6 +29,11 @@ export class Product {
 
     @Prop({ required: true })
     addBy: string;
+
+    @Prop()
+    imgPath: string;
+
+
 
 }
 export const ProductSchema = SchemaFactory.createForClass(Product);
