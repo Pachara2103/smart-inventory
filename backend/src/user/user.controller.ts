@@ -2,6 +2,7 @@ import { Body, Controller, Get, Post, Req, Request, UseGuards } from '@nestjs/co
 import { SignUpDto } from './dto/signup.dto';
 import { UserService } from './user.service';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
+import { find } from 'rxjs';
 
 @Controller('user')
 export class UserController {
@@ -18,6 +19,11 @@ export class UserController {
     async getProfile(@Request() req) {
         const finduser = this.userServise.findByEmail(req.user.email);
         return finduser;
+    }
+
+    @Get('getalluser')
+    AllUser(@Request() req) {
+        return this.userServise.getAllUser();
     }
 
 }

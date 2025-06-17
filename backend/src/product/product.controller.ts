@@ -38,7 +38,7 @@ export class ProductController {
         @UploadedFile() file: Express.Multer.File,
         @Body() productDto: ProductDto,
     ) {
-        console.log('Uploaded file info:', file.filename);
+        // console.log('Uploaded file info:', file.filename);
         productDto.imgPath = file ? file.filename : null;
 
         return this.productService.creatProduct(productDto);
@@ -48,29 +48,30 @@ export class ProductController {
     getAllProduct(@Request() req) {
         return this.productService.getAllProduct();
     }
+    
+    @Get('getallcategory')
+    AllCategory(@Request() req) {
+        return this.productService.getAllCategory();
+    }
+
+     @Get('getallhistory')
+    getAllHistory(@Request() req) {
+        return this.productService.getAllHistory();
+    }
 
     @Get('getproduct')
-    getProduct(@Query() query: any) {
-        const q = query.q; // "name:Banana"
-
-        if (q) {
-            // แปลง q จาก string "name:Banana" เป็น { name: "Banana" }
-            const filter: any = {};
-            q.split(',').forEach(pair => {
-                const [key, value] = pair.split(':').map(s => s.trim());
-                if (key && value) {
-                    filter[key] = value;
-                }
-            });
-            console.log('filter:', filter);
-            return this.productService.getProduct(filter);
-        }
+    getProduct(@Query() q: any) {
+        return this.productService.getProduct(q);
+    }
+     @Get('gethistoryproduct')
+    getHistoryProduct(@Query() q: any) {
+        return this.productService.getHistoryProduct(q);
     }
 
     @Get('sortproduct')
-    async sortProduct(@Query('sortType') sortType: string, @Query('asc') asc: string){
+    async sortProduct(@Query('sortType') sortType: string, @Query('asc') asc: string) {
         // console.log(sortType, asc);
-        const Asc = asc==="true"?  true: false;
+        const Asc = asc === "true" ? true : false;
         return this.productService.sortType(sortType, Asc);
     }
 
@@ -78,9 +79,14 @@ export class ProductController {
     async selectCategory(@Query('category') category: string) {
         return this.productService.selectCategory(category);
     }
-     @Get('sale')
-    async saleProduct(@Query()r: any) {
+    @Get('sale')
+    async saleProduct(@Query() r: any) {
         return this.productService.getSaleProduct();
+    }
+
+    @Get('sale/selectcategory')
+    async getsaleProduct(@Query() q: any) {
+        return this.productService.saleSelectCategory(q.category);
     }
 
     @Post('add')
@@ -92,6 +98,7 @@ export class ProductController {
 
     @Post('req')
     async reqProduct(@Body() body: { sku: string; amount: number; description: string, user: string }) {
+        console.log('req', body);
 
         return { msg: 'req successfully', req: await this.productService.updateQuantity(body.sku, body.amount, body.description, "Req", body.user) };
     }

@@ -1,29 +1,41 @@
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import { RouterLink, RouterView, useRoute } from 'vue-router'
-import productIcon from '@/images/icons/product.png'
-
+import axios from 'axios'
 
 
 const route = useRoute()
-const isProductOpen = ref(false)
 const activeTab = ref('dashboard')
+const test = ref('nothing')
+const User = ref(null)
 
 
-onMounted(() => {
-  //  activeTab === 'dashboard';
+onMounted(async () => {
+  try {
+    const getUser = await axios.get('http://localhost:3000/user/profile', {
+      withCredentials: true // send cookies
+    })
+    User.value = getUser.data
+    console.log('User Pic= ', User.value.picture)
 
+  } catch (error) {
+    console.error('Error fetching products:', error)
+  }
 })
 
 
+watch(() => route.fullPath, (newPath) => {
+
+  if (newPath === '/Product/Add') {
+    test.value = 'heyyy'
+    activeTab.value = 'addproduct'
+  } else {
+    test.value = 'nothing'
+  }
+})
+
 function handleClick(tabName) {
   activeTab.value = tabName
-  if (tabName === 'product') {
-    isProductOpen.value = !isProductOpen.value
-  } else {
-    isProductOpen.value = false
-  }
-
 }
 </script>
 
@@ -32,6 +44,9 @@ function handleClick(tabName) {
 
     <nav class="tab" v-if="route.path !== '/'">
       <label style="text-align: center; margin-bottom: 20px;"> INVENTORY</label>
+      <label> {{ route.fullPath }} {{ test }}</label>
+
+      <img v-if="User && User.picture" :src="User.picture" width="30" height="30">
       <RouterLink to="/Dashboard" class="tab-box" :class="{ active: activeTab === 'dashboard' }"
         @click="handleClick('dashboard')">
 
@@ -52,21 +67,19 @@ function handleClick(tabName) {
         </svg>
         <label> Product</label>
 
-        <svg v-if="!isProductOpen" :style="{ width: '30px', height: '30px', position:'absolute', right:'10px'}" viewBox="-5 -5 35 35">
-          <path xmlns="http://www.w3.org/2000/svg"
-            d="M15.4,9.88,10.81,5.29a1,1,0,0,0-1.41,0,1,1,0,0,0,0,1.42L14,11.29a1,1,0,0,1,0,1.42L9.4,17.29a1,1,0,0,0,1.41,1.42l4.59-4.59A3,3,0,0,0,15.4,9.88Z" />
-        </svg>
-        <svg v-else="isProductOpen" :style="{ fill: 'white', width: '20px', height: '20px', position:'absolute', right:'10px'}"
-          viewBox="-5 -5 35 35">
-          <path xmlns="http://www.w3.org/2000/svg"
-            d="M1.51,6.079a1.492,1.492,0,0,1,1.06.44l7.673,7.672a2.5,2.5,0,0,0,3.536,0L21.44,6.529A1.5,1.5,0,1,1,23.561,8.65L15.9,16.312a5.505,5.505,0,0,1-7.778,0L.449,8.64A1.5,1.5,0,0,1,1.51,6.079Z" />
-        </svg>
 
       </RouterLink>
 
-      <div v-if="isProductOpen" class="sub-menu">
-        <RouterLink to="/Product/Add" class="sub-tab">- Add Product</RouterLink>
-      </div>
+      <RouterLink to="/Product/Add" class="tab-box" :class="{ active: activeTab === 'addproduct' }"
+        @click="handleClick('addproduct')">
+
+        <svg :style="{ fill: activeTab === 'addproduct' ? 'white' : '', width: '30px', height: '30px' }"
+          viewBox="0 0 25 25">
+          <path xmlns="http://www.w3.org/2000/svg"
+            d="M17,11H13V7a1,1,0,0,0-2,0v4H7a1,1,0,0,0,0,2h4v4a1,1,0,0,0,2,0V13h4a1,1,0,0,0,0-2Z" />
+        </svg>
+        <label> Add Product</label>
+      </RouterLink>
 
       <RouterLink to="/History" class="tab-box" :class="{ active: activeTab === 'history' }"
         @click="handleClick('history')">
@@ -87,32 +100,26 @@ function handleClick(tabName) {
 
 <style>
 .sub-menu {
-  margin-left: 40px;
+  height: 25px;
+  border-radius: 5px;
+  padding-left: 40px;
   display: flex;
   flex-direction: column;
   gap: 10px;
   padding-top: 5px;
-}
-
-.sub-tab {
   color: black;
   text-decoration: none;
   font-size: 0.9rem;
 }
 
-.sub-tab:hover {
-  color: blue;
-}
-
 .container {
-  /* flex: 1; */
   flex-direction: row;
   display: flex;
-  /* height: 100vh; */
   margin-left: 225px;
-  background-color: rgb(255, 158, 109);
+  background-color: rgb(251, 251, 251);
   justify-content: center;
   align-items: center;
+  /* position: relative; */
 }
 
 .tab {
@@ -129,8 +136,6 @@ function handleClick(tabName) {
   padding: 1rem;
   border: 2px solid #dcdcdc;
   border-radius: 10px;
-  /* text-decoration: none; */
-  /* z-index: 1000; */
 
 }
 

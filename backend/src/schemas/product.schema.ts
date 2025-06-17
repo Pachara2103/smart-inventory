@@ -34,7 +34,6 @@ export class Product {
     imgPath: string;
 
 
-
 }
 export const ProductSchema = SchemaFactory.createForClass(Product);
 

@@ -16,13 +16,24 @@ const sale = ref([])
 
 const sortby = ref("date")
 const asc = ref(true)
+const allProduct = ref(0)
+const allUser = ref(0)
+const allCategory = ref(0)
+const allSale = ref(0)
+
 
 onMounted(async () => {
   try {
     const response = await axios.get('http://localhost:3000/product/getallproduct')
+    const totalCategory = await axios.get('http://localhost:3000/product/getallcategory')
+    const totalUser = await axios.get('http://localhost:3000/user/getalluser')
     // ProductByCategory.value = response.data
     SelectCategory()
     AllProduct.value = response.data
+    allProduct.value = AllProduct.value.length
+    allUser.value = totalUser.data
+    allCategory.value = totalCategory.data
+
 
   } catch (error) {
     console.error('Error fetching products:', error)
@@ -32,6 +43,7 @@ onMounted(async () => {
     const response = await axios.get('http://localhost:3000/product/sale')
     // ProductByCategory.value = response.data
     sale.value = response.data
+    allSale.value = sale.value.length
     console.error('sale:', sale.value)
 
   } catch (error) {
@@ -96,7 +108,7 @@ const sortType = async () => {
   const response = await axios.get('http://localhost:3000/product/sortproduct', {
     params: {
       sortType: sortby.value,
-      asc: asc.value===true?  "true":"false"
+      asc: asc.value === true ? "true" : "false"
     }
   })
   AllProduct.value = response.data
@@ -112,16 +124,34 @@ const SelectCategory = async () => {
   ProductByCategory.value = response.data
   console.log('ProductByCategory.value= ', ProductByCategory.value)
 }
+const SaleSelectCategory = async () => {
+  const response = await axios.get('http://localhost:3000/product/sale/selectcategory', {
+    params: {
+      category: saleCategory.value
+    }
+  })
+  sale.value = response.data
+  console.log('ProductByCategory.value= ', ProductByCategory.value)
+}
 
 const pressUp = (value) => {
   asc.value = value
   // console.log('press up')
 }
 
+
 watch(() => category.value, () => {
   SelectCategory()
   console.log('call select category')
 })
+const saleCategory = ref('All')
+watch(() => saleCategory.value, () => {
+  SaleSelectCategory()
+})
+
+// watch(() => AllProduct.value, () => {
+//   size.value = AllProduct.value.length
+// })
 
 watch([sortby, asc], () => {
   sortType()
@@ -141,7 +171,7 @@ watch([sortby, asc], () => {
 
           <div
             style="flex-direction: column; background-color: white; width: 100px; height: 40px; position: absolute; left: 40px;">
-            <label style="text-align: left;"> 100 </label>
+            <label style="text-align: left;"> {{ allUser }}</label>
             <label> Total User</label>
           </div>
         </div>
@@ -153,7 +183,7 @@ watch([sortby, asc], () => {
 
           <div
             style="flex-direction: column; background-color: white; width: 110px; height: 40px; position: absolute; left: 40px;">
-            <label style="text-align: left;"> 100 </label>
+            <label style="text-align: left;"> {{ allCategory }} </label>
             <label> Total Category</label>
           </div>
         </div>
@@ -164,8 +194,8 @@ watch([sortby, asc], () => {
           <img :src="saleIcon" width="50" height="50" style="position: absolute; right: 25px;">
           <div
             style="flex-direction: column; background-color: white; width: 110px; height: 40px; position: absolute; left: 40px;">
-            <label style="text-align: left;"> 100 </label>
-            <label> Total Category</label>
+            <label style="text-align: left;">{{ allSale }}</label>
+            <label> Total Sales</label>
           </div>
         </div>
       </div>
@@ -176,8 +206,8 @@ watch([sortby, asc], () => {
 
           <div
             style="flex-direction: column; background-color: white; width: 110px; height: 40px; position: absolute; left: 40px;">
-            <label style="text-align: left;"> 100 </label>
-            <label> Total Category</label>
+            <label style="text-align: left;"> {{ allProduct }} </label>
+            <label> Total Product</label>
           </div>
         </div>
       </div>
@@ -194,6 +224,12 @@ watch([sortby, asc], () => {
           <Bar :data="saleChart" :options="saleChartOptions" />
         </div>
 
+        <select v-model="saleCategory" class="select">
+          <option value="All">All Category</option>
+          <option value="Fruit">Fruit</option>
+          <option value="Mobile">Mobile</option>
+        </select>
+
       </div>
 
       <div class="circle-graph">
@@ -202,7 +238,7 @@ watch([sortby, asc], () => {
           <Pie :data="chartData" :options="chartOptions" />
         </div>
 
-        <select v-model="category">
+        <select v-model="category" class="select">
           <option disabled value="">category</option>
           <option value="Fruit">Fruit</option>
           <option value="Mobile">Mobile</option>
@@ -230,8 +266,20 @@ watch([sortby, asc], () => {
             <tbody>
               <tr v-for="(product, index) in AllProduct" :key="product._id">
                 <td>{{ index + 1 }}</td>
+                <td>
+                  <div
+                    style="flex-direction: row; display: flex; justify-content: center; align-items: center; gap: 10px;">
+
+                    <div style="width: 30px; height: 30px;">
+                      <img :src="`http://localhost:3000/images/${product.imgPath}`" style="width: 100%; height: 100%;">
+                    </div>
+
+                    {{ product.name }}
+
+                  </div>
+
+                </td>
                 <td>{{ product.sku }}</td>
-                <td>{{ product.name }}</td>
                 <td>{{ product.price }}</td>
               </tr>
             </tbody>
@@ -399,7 +447,7 @@ watch([sortby, asc], () => {
 
 }
 
-.circle-graph select {
+.select {
   width: auto;
   padding: 5px 5px;
   border: 1px solid #ccc;

@@ -1,14 +1,18 @@
 <script setup>
-import { ref, onMounted, reactive } from 'vue'
+import { ref, onMounted, reactive, computed } from 'vue'
 import axios from 'axios'
 import searchIcon from '@/images/icons/search.png'
 
 
 const AllProduct = ref([])
-const searchQuery = ref('')
+const searchValue = ref('')
+const searchType = ref('name')
+
 const User = ref({});
-const activeRow = ref(null) // บอกว่า row ไหนเปิด popover อยู่
-const popoverData = reactive({
+
+const currentIndex = ref(null)
+const isAdd = ref(null)
+const actionData = reactive({
   amount: 0,
   description: '',
 })
@@ -38,8 +42,9 @@ onMounted(async () => {
 });
 
 const handleSearch = async () => {
-  console.log('search= ', searchQuery.value);
-  if (!searchQuery.value) {
+  currentPage.value = 1;
+  console.log('search= ', searchValue.value);
+  if (!searchValue.value) {
     const response = await axios.get('http://localhost:3000/product/getallproduct')
     AllProduct.value = response.data
     console.log('noData!!!!')
@@ -48,7 +53,9 @@ const handleSearch = async () => {
     try {
       const res = await axios.get('http://localhost:3000/product/getproduct', {
         params: {
-          q: searchQuery.value  // ส่งค่า q ไปกับ query string
+          value: searchValue.value,
+          type: searchType.value
+
         }
       })
       AllProduct.value = res.data
@@ -61,28 +68,32 @@ const handleSearch = async () => {
 
 }
 
-const openPopover = (index) => {
-  console.log('Add press')
-  activeRow.value = index
-  popoverData.amount = 0
-  popoverData.description = ''
+const openAction = (index, value) => {
+  console.log('press', value)
+  currentIndex.value = index
+  isAdd.value = value === 'add' ? true : false
+  actionData.amount = 0
+  actionData.description = ''
 }
 
-const closePopover = () => {
-  activeRow.value = null
+const closeAction = () => {
+  isAdd.value = null
+  currentIndex.value = null
 }
 
 const submitAdd = async (product) => {
   try {
     const response = await axios.post('http://localhost:3000/product/add', {
       sku: product.sku,
-      amount: popoverData.amount,
-      description: popoverData.description,
+      amount: actionData.amount,
+      description: actionData.description,
       user: User.value.name
     })
     console.log('Add success:', response.data)
+    alert("Add success!");
+    window.location.reload();
 
-    closePopover()
+    closeAction()
   } catch (err) {
     console.error('Error adding:', err)
   }
@@ -92,28 +103,64 @@ const submitReq = async (product) => {
   try {
     const response = await axios.post('http://localhost:3000/product/req', {
       sku: product.sku,
-      amount: popoverData.amount,
-      description: popoverData.description,
+      amount: actionData.amount,
+      description: actionData.description,
       user: User.value.name
     })
     console.log('Req success:', response.data)
+    alert("Req success!");
+    window.location.reload();
 
-    closePopover()
+    closeAction()
   } catch (err) {
     console.error('Error adding:', err)
   }
 }
 
+const currentPage = ref(1);
+const pageSize = 7;
+
+const pageProduct = computed(() => {
+  const start = (currentPage.value - 1) * pageSize;
+  const end = start + pageSize;
+  return AllProduct.value.slice(start, end);
+});
+
+const totalPages = computed(() => {
+  return Math.ceil(AllProduct.value.length / pageSize);
+});
+
+const goToPage = (page) => {
+  if (page >= 1 && page <= totalPages.value) {
+    currentPage.value = page;
+  }
+};
+
 </script>
 
 <template>
   <div class="product-container">
-    <label style="font-size: 30px; padding-bottom: 20px;">All Products</label>
+    <label style="font-size: 30px; padding-bottom: 20px; font-weight: bold;">ALL PRODUCTS</label>
+
+    <RouterLink to="/Product/Add" class="tab-box">
+      <div style="cursor: pointer; position: relative; width: 100%; height: 100%;">
+        <label style="cursor: pointer; font-size:30px; position: absolute; left: 0; bottom: 2px;">+</label>
+        <label style="cursor: pointer; font-size:16px; position: absolute; left: 22px; top: 6px;">Add New Product</label>
+
+      </div>
+
+    </RouterLink>
+
     <div class="search">
-      <img :src="searchIcon" width=35 height=35 style="margin-right: 5px;">
-      <input type="search" v-model="searchQuery" placeholder="search ex. sku:PROD000, name: anything"
-        style="width: 340px;" />
-      <button @click="handleSearch">Search</button>
+      <img :src="searchIcon" width=40 height=40 style="margin-right: 5px;">
+      <select v-model="searchType">
+        <option value="name">Name</option>
+        <option value="sku">Sku</option>
+        <option value="category">Category</option>
+      </select>
+      <input type="search" v-model="searchValue" placeholder="Search..." style="width: 340px;"
+        @keyup.enter="handleSearch" />
+      <button @click="handleSearch">Enter</button>
     </div>
 
     <table class="product-table">
@@ -122,16 +169,16 @@ const submitReq = async (product) => {
           <th>Product</th>
           <th>SKU</th>
           <th>Category</th>
-          <th>Qty</th>
+          <th>Quantity</th>
           <th>Unit</th>
           <th>Price</th>
-          <th>Add By</th>
+          <th>Added By</th>
           <th>Action</th>
         </tr>
       </thead>
       <tbody>
-        <tr v-for="(product, index) in AllProduct" :key="index">
-          <td>
+        <tr v-for="(product, index) in pageProduct" :key="index">
+          <td style="width: 210px;">
             <div style="flex-direction: row; display: flex; justify-content: center; align-items: center; gap: 10px;">
 
               <div style="width: 50px; height: 50px;">
@@ -143,60 +190,91 @@ const submitReq = async (product) => {
             </div>
 
           </td>
-          <td>{{ product.sku }}</td>
-          <td>{{ product.category }}</td>
-          <td>{{ product.quantity }}</td>
-          <td>{{ product.unit }}</td>
-          <td>{{ product.price }}</td>
-          <td>{{ product.addBy }}</td>
-          <td>
-            <button @click="openPopover(index)">ADD</button>
-            <button style="margin-left: 10px;">REQ</button>
+          <td style="width: 100px;">{{ product.sku }}</td>
+          <td style="width: 100px;">{{ product.category }}</td>
+          <td style="width: 100px;">{{ product.quantity }}</td>
+          <td style="width: 100px;">{{ product.unit }}</td>
+          <td style="width: 100px;">{{ product.price }}</td>
+          <td style="width: 100px;">{{ product.addBy }}</td>
+          <td style="width: 180px;">
+            <button @click="openAction(index, 'add')"
+              :style="{ background: currentIndex === index && isAdd === true ? '#02be1c' : '' }">ADD</button>
+            <button @click="openAction(index, 'req')"
+              :style="{ background: currentIndex === index && isAdd === false ? '#02be1c' : '', marginLeft: '10px' }">REQ</button>
 
-            <div v-if="activeRow === index" class="popover">
+
+            <div v-if="isAdd === true && currentIndex === index" class="popover">
+              <div style="position: relative; flex-direction: row;">
+                <label style="margin-bottom: 10px;"> Add </label>
+                <label style="margin-bottom: 10px; color: #28b463">{{ product.name }}</label>
+              </div>
               <label>Amount:</label>
-              <input type="number" v-model="popoverData.amount" />
+              <input type="number" v-model="actionData.amount" />
 
               <label>Description:</label>
-              <input type="text" v-model="popoverData.description" />
+              <input type="text" v-model="actionData.description" />
 
-              <button @click="submitAdd(product)">Submit</button>
-              <button @click="closePopover()" style="margin-left: 5px;">Cancel</button>
+              <div>
+                <button @click="submitAdd(product)">Submit</button>
+                <button @click="closeAction()" style="margin-left: 5px;">Cancel</button>
+              </div>
+
+
             </div>
 
-            <!-- <div v-if="activeRow === index" class="popover">
+            <div v-if="isAdd === false && currentIndex === index" class="popover">
+              <div style="position: relative; flex-direction: row;">
+                <label style="margin-bottom: 10px;"> Req </label>
+                <label style="margin-bottom: 10px; color: #28b463">{{ product.name }}</label>
+              </div>
               <label>Amount:</label>
-              <input type="number" v-model="popoverData.amount" />
+              <input type="number" v-model="actionData.amount" />
 
               <label>Description:</label>
-              <input type="text" v-model="popoverData.description" />
+              <input type="text" v-model="actionData.description" />
 
-              <button @click="submitAdd(product)">Submit</button>
-              <button @click="closePopover()" style="margin-left: 5px;">Cancel</button>
-            </div> -->
+
+              <div>
+                <button @click="submitReq(product)">Submit</button>
+                <button @click="closeAction()" style="margin-left: 5px;">Cancel</button>
+
+              </div>
+
+            </div>
           </td>
         </tr>
       </tbody>
     </table>
+
+    <div style="margin-top: 20px; position: absolute; bottom: 0;">
+      <button v-for="page in totalPages" :key="page" @click="goToPage(page)"
+        :style="{ marginRight: '5px', background: page === currentPage ? '#FF6F3C' : '#999999' }">
+        {{ page }}
+      </button>
+    </div>
+
+
   </div>
 </template>
 
 <style scoped>
 .product-container {
   width: auto;
-  ;
+  height: 98vh;
+  position: relative;
   display: flex;
   flex-direction: column;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background-color: rgb(255, 153, 224);
-  justify-content: center;
+  background-color: #f8f9f9;
   align-items: center;
+  border-radius: 10px;
 }
 
 .search {
   display: flex;
   justify-content: center;
-  background-color: rgb(7, 236, 160);
+  gap: 5px;
+  margin-bottom: 15px;
 }
 
 .product-table {
@@ -204,7 +282,6 @@ const submitReq = async (product) => {
   border-collapse: collapse;
   background-color: #fff;
   border: 1px solid #ccc;
-  margin-top: 20px;
 
 }
 
@@ -224,12 +301,9 @@ const submitReq = async (product) => {
 .product-table td {
   position: relative;
   padding: 12px 15px;
-  /* text-align: left; */
   border-bottom: 1px solid #ddd;
   border: 1px solid #ccc;
   text-align: center;
-  /* ขอบทุกเซลล์ */
-
 }
 
 .product-table tbody tr:hover {
@@ -252,20 +326,57 @@ const submitReq = async (product) => {
 
 .popover {
   position: absolute;
-  top: 100%;
-  /* ใต้ปุ่ม */
-  left: 1;
-  background: #fff;
-  border: 1px solid #ddd;
-  padding: 10px;
+  top: 15px;
+  left: 160px;
+  width: 170px;
+  border: 2px solid #dedede;
+  padding: 15px;
   z-index: 100;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
   margin-top: 5px;
+
+  flex-direction: column;
+
+  justify-content: center;
+  align-items: center;
+  display: flex;
+
+  background-color: rgb(255, 255, 255);
 }
 
 .popover input {
   display: block;
   margin: 5px 0;
   width: 120px;
+}
+
+.search select {
+  width: auto;
+  padding: 5px 5px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  outline: none;
+}
+
+.tab-box {
+  position: absolute;
+  top: 10px;
+  right: 0;
+  width: 160px;
+  height: 35px;
+  border-radius: 5px;
+  justify-content: center;
+
+  flex-direction: row;
+  display: flex;
+
+  background-color: rgb(250, 134, 26);
+  color: rgb(255, 255, 255);
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.tab-box:hover {
+  background-color: #d18100;
 }
 </style>

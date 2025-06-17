@@ -18,6 +18,12 @@ export class User {
   @Prop({ required: true })
   googleId: string;
 
+  @Prop({ required: true })
+  userType: string;
+
+  @Prop()
+  picture: string;
+
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

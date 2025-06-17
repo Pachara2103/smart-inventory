@@ -5,7 +5,7 @@ export class ProductDto{
     readonly quantity: string; 
     readonly unit: string;
     readonly price: string;
-    readonly addBy:string;
+    readonly addedBy:string;
     imgPath?: string | null;
 
 }

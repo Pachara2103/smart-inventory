@@ -17,7 +17,15 @@ export class ProductService {
         console.log('add product  === ', productDto);
         const newProduct = new this.productModel(productDto);
 
-        const history = new this.historyModel({ sku: productDto.sku, quantity: productDto.quantity, description: `create new product by ${productDto.addBy}`, action: `creat new product` });
+        const history = new this.historyModel({
+            name: productDto.name,
+            sku: productDto.sku,
+            category: productDto.category,
+            quantity: productDto.quantity,
+            unit: productDto.unit,
+            description: `create new product`,
+            action: `New`
+        });
         await history.save();
 
         return newProduct.save(); //เข้า mongo
@@ -27,18 +35,20 @@ export class ProductService {
         return this.productModel.find().exec();
     }
 
-    async getProduct(query: any) {
-        if (!query) return this.productModel.find().exec();
-        const filter: any = {};
+    async getAllHistory(): Promise<HistoryDocument[] | null> {
+        return this.historyModel.find().exec();
+    }
 
-        // ใช้ regex เพื่อให้ค้นหาแบบ partial match และไม่สน case
-        if (query.name) filter.name = { $regex: new RegExp(query.name, 'i') };
-        if (query.sku) filter.sku = { $regex: new RegExp(query.sku, 'i') };
-        if (query.category) filter.category = { $regex: new RegExp(query.category, 'i') };
-        if (query.unit) filter.unit = { $regex: new RegExp(query.unit, 'i') };
-        if (query.addBy) filter.addBy = { $regex: new RegExp(query.addBy, 'i') };
+    async getProduct(q: any) {
+        const value = q.value;
+        const type = q.type;
+        return this.productModel.find({ [type]: { $regex: `^${value}`, $options: 'i' } }).exec();
+    }
 
-        return this.productModel.find(filter).exec();
+    async getHistoryProduct(q: any) {
+        const value = q.value;
+        const type = q.type;
+        return this.historyModel.find({ [type]: { $regex: `^${value}`, $options: 'i' } }).exec();
     }
 
     async sortType(sortType: string, asc: boolean) {
@@ -47,14 +57,14 @@ export class ProductService {
             return products;
         }
         else if (sortType === "name") {
-            const products = await this.productModel.find().sort({ name:  asc ? -1 : 1 });
+            const products = await this.productModel.find().sort({ name: asc ? -1 : 1 });
             return products;
         }
         else if (sortType === "price") {
-            const products = await this.productModel.find().sort({ price:  asc ? 1 : -1 });
+            const products = await this.productModel.find().sort({ price: asc ? 1 : -1 });
             return products;
-        }else if (sortType === "sku") {
-            const products = await this.productModel.find().sort({ sku:  asc ? -1 : 1 });
+        } else if (sortType === "sku") {
+            const products = await this.productModel.find().sort({ sku: asc ? -1 : 1 });
             return products;
         }
         return;
@@ -64,6 +74,11 @@ export class ProductService {
     async selectCategory(category: string) {
         const products = await this.productModel.find({ category: category });
         return products;
+    }
+
+    async getAllCategory() {
+        const categories = await this.productModel.distinct("category");
+        return categories.length;
     }
 
     async updateQuantity(sku: string, amount: number, description: string, type: string, user: string) {
@@ -84,7 +99,7 @@ export class ProductService {
 
         await history.save();
 
-        if (product.quantity - amount && type === "Req") {
+        if (product.quantity - amount < 0 && type === "Req") {
             return "not enough quantity"
         }
         product.quantity = type === "Add" ? product.quantity + amount : product.quantity - amount;
@@ -93,9 +108,51 @@ export class ProductService {
         return product;
     }
     async getSaleProduct() {
-        const sale = await this.historyModel.find({ action: "Req" });
-        console.log("call sale")
+        const sale = await this.historyModel.aggregate([
+            {
+                $match: { action: "Req" }
+
+            },
+            {
+                $group: {
+                    _id: "$sku",
+                    name: { $first: "$name" },
+                    quantity: { $sum: "$quantity" },
+                }
+            }
+        ]);
+        console.log("sale", sale)
         return sale;
+    }
+
+    async saleSelectCategory(category: string) {
+        if (category === "All") {
+            const sale = await this.historyModel.aggregate([
+                { $match: { action: "Req" } },
+                {
+                    $group: {
+                        _id: "$sku",
+                        name: { $first: "$name" },
+                        quantity: { $sum: "$quantity" },
+                    }
+                }]);
+            return sale;
+        }
+        else {
+
+            const sale = await this.historyModel.aggregate([
+                { $match: { action: "Req", category: category } },
+                {
+                    $group: {
+                        _id: "$sku",
+                        name: { $first: "$name" },
+                        quantity: { $sum: "$quantity" },
+                    }
+                }
+            ]);
+            return sale;
+        }
+
     }
 
 

@@ -11,7 +11,7 @@ const product = ref({
     quantity: '',
     unit: '',
     price: '',
-    addBy: ''
+    addedBy: ''
 })
 
 
@@ -21,7 +21,13 @@ onMounted(async () => {
             withCredentials: true // send cookies
         })
         User.value = getUser.data
-        console.log('User.value = ',  User.value)
+        console.log('User.name = ', User.value)
+        if (User.value.userType === "admin") {
+            product.value.addedBy = "admin"
+        }
+        else {
+            product.value.addedBy = `user: ${User.value.name}`;
+        }
 
     } catch (error) {
         console.error('Error fetching products:', error)
@@ -72,7 +78,7 @@ async function sendData() {
         formData.append('quantity', product.value.quantity)
         formData.append('unit', product.value.unit)
         formData.append('price', product.value.price)
-        formData.append('addBy', product.value.addBy)
+        formData.append('addedBy', product.value.addBy)
 
         if (uploadImage.value) {
             formData.append('image', ImagetoStore.value) // 'image' ต้องตรงกับ NestJS FileInterceptor
@@ -106,73 +112,61 @@ async function sendData() {
 
 <template>
     <div class="container">
-        <div class="topic">
+        <!-- <div class="topic">
             ADD Product
             <div style="font-size: small;">Create new product</div>
-        </div>
+        </div> -->
 
         <div class="add-container">
-            <div>
+            <div class="add-box">
                 <label>Product Name</label>
-                <div>
-                    <input type="text" v-model="product.name" />
-                </div>
+                <input type="text" v-model="product.name" style="width: 95%;" />
             </div>
 
-            <div>
+            <div class="add-box" style="position: absolute; right:70px;">
                 <label>SKU</label>
-                <div> <input type="text" v-model="product.sku" /> </div>
-
+                <input type="text" v-model="product.sku" style="width: 95%;" />
             </div>
 
-            <div>
+            <div class="add-box" style="position: absolute; right:70px; top: 100px;">
                 <label>Category</label>
-
-                <div>
-                    <select v-model="product.category">
-                        <option disabled value="">select category</option>
-                        <option value="Fruit">Fruit</option>
-                        <option value="Mobile">Mobile</option>
-                    </select>
-
-                </div>
+                <select v-model="product.category">
+                    <option disabled value="">select category</option>
+                    <option value="Fruit">Fruit</option>
+                    <option value="Mobile">Mobile</option>
+                </select>
             </div>
 
-            <div> <label>Quantity</label>
-                <div>
-                    <input type="number" v-model="product.quantity" />
-                </div>
-
+            <div class="add-box" style="position: absolute; top:100px;">
+                <label>Quantity</label>
+                <input type="number" v-model="product.quantity" style="width: 95%;" />
             </div>
 
-            <div>
-                <label>Unit</label>
+            <div
+                style="  background-color: aquamarine;display: flex;flex-direction: row;justify-content: flex-start;width: 370px; position: absolute;top: 200px;">
+                <div style="flex-direction: column; display: flex; height: 100%; width: 50%;">
+                    <label>Price</label>
+                    <input type="number" step="0.01" v-model="product.price" style="width: 75%;" />
+                </div>
 
-                <div>
-                    <select v-model="product.unit">
+                <div style="flex-direction: column; display: flex; height: 100%; width: 50%;">
+                    <label>Unit</label>
+                    <select v-model="product.unit" style="width: 80%;">
                         <option disabled value="">select unit</option>
                         <option value="kg">kg</option>
                         <option value="pc">pc</option>
                     </select>
                 </div>
+
             </div>
 
-            <div> <label>Price</label>
-                <div> <input type="number" step="0.01" v-model="product.price" /> </div>
-            </div>
-
-            <div>
+            <div class="add-box" style="position: absolute;top: 300px;">
                 <label>Added By</label>
-                <div>
-                    <input type="text" v-model="User.name" readonly />
-                </div>
-
+                <input type="text" v-model="product.addedBy" style="width: 95%;" readonly />
             </div>
 
-            <div class="image-upload">
-                <label style="margin-left: 50px;">Product Image</label>
-
-
+            <div class="add-box" style="position: absolute;top: 200px; right: 75px;">
+                <label>Product Image</label>
                 <div v-if="uploadImage" class="area-img">
                     <img :src="uploadImage">
                 </div>
@@ -183,10 +177,13 @@ async function sendData() {
 
                 <input type="file" ref="fileInput" accept="image/*" @change="onFileChange" hidden />
 
-                <div>
-                    <button v-if="uploadImage" @click="DeleteImage"> Delete</button>
-                </div>
 
+
+            </div>
+
+            <div>
+                <button v-if="uploadImage" @click="DeleteImage"
+                    style="position: absolute; bottom: 0; background-color: red;"> Delete</button>
             </div>
 
             <div>
@@ -198,10 +195,19 @@ async function sendData() {
 </template>
 
 <style scoped>
+.add-box {
+    background-color: aquamarine;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    width: 370px;
+    position: relative;
+}
+
 .container {
-    /* display: flex; */
     align-items: center;
     justify-content: center;
+    display: flex;
 
     background-color: burlywood;
     width: 100%;
@@ -216,19 +222,17 @@ async function sendData() {
 }
 
 .add-container {
-    width: 50%;
-    height: auto;
+    position: relative;
+    width: 110vh;
+    height: 55vh;
     background-color: white;
-    margin: 70px auto;
     padding: 20px;
+    gap: 15px;
+    border-radius: 10px;
+
     display: flex;
     flex-direction: column;
-    gap: 15px;
-    box-sizing: border-box;
-
     align-items: flex-start;
-    /* margin-left: 60px; */
-    /* justify-content:flex-start; */
 }
 
 .add-container select {
@@ -239,18 +243,11 @@ async function sendData() {
     border-radius: 8px;
     background-color: #fff;
     color: #333;
-    /* appearance: none;  */
-    /* ลบ UI default ของบาง browser */
     outline: none;
     transition: border-color 0.3s ease;
-
     margin-top: 10px;
 }
 
-.add-container select:focus {
-    border-color: #5f6066;
-    /* box-shadow: 0 0 5px rgba(76, 76, 77, 0.5); */
-}
 
 .add-container label {
     width: 120px;
@@ -258,30 +255,14 @@ async function sendData() {
 }
 
 .add-container input {
-    /* flex: 1; */
-    /* padding: 10px; */
     width: 40vh;
     margin-top: 10px;
 }
 
-.image-upload {
-    position: absolute;
-    top: 35vh;
-    left: 130vh;
-
-    width: 200px;
-    height: 200px;
-    align-items: center;
-    justify-content: center;
-
-    border-radius: 40px;
-
-    margin-top: 1rem;
-    /* background-color: #ebc5c5; */
-}
 
 .area-img {
-
+    position: absolute;
+    left: 22%;
     width: 200px;
     height: 200px;
     border: 2px dashed #aaa;
@@ -291,10 +272,8 @@ async function sendData() {
     justify-content: center;
     margin-top: 20px;
     /* color: #777; */
-
     cursor: pointer;
     overflow: hidden;
-    position: relative;
     transition: border-color 0.3s ease;
     background-color: #f2f2f2df;
 }
@@ -311,28 +290,12 @@ async function sendData() {
 
 }
 
-.image-upload button {
-    background-color: red;
-    margin-left: 60px;
-    margin-top: 5px;
-}
-
-.image-upload button:hover {
-    color: #dfe23f;
-}
-
 .add-button {
     position: absolute;
-    top: 80vh;
-    left: 126vh;
-
+    bottom: 5px;
+    right: 45%;
     background-color: rgb(29, 179, 66);
     margin-left: 60px;
     margin-top: 5px;
-}
-
-.add-button:hover {
-    border-color: #dfe23f;
-    color: #f6ff00;
 }
 </style>

@@ -24,18 +24,14 @@ export class History {
     @Prop({ required: true })
     unit: string;
 
-    // @Prop({ required: true })
-    // price: string;
-
     @Prop()
     description: string;
 
-    @Prop({ required: true })
+    @Prop()
     action: string;
 
     @Prop()
     user: string;
-
 
 }
 export const HistorySchema = SchemaFactory.createForClass(History);
