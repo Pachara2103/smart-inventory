@@ -1,0 +1,41 @@
+
+services:
+  mongo_new:
+    image: mongo:latest
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: '1234'
+    ports:
+      - "2222:27017"
+    volumes:
+     - mongo-data:/data/db
+    networks:
+      - Mynetwork
+
+  nestjs:
+    build:
+      context: ./backend   # path ไปที่โฟลเดอร์โปรเจค nestjs ของคุณ (Dockerfile ต้องอยู่ที่นี่)
+      dockerfile: Dockerfile  # ชื่อไฟล์ dockerfile (ถ้าใช้ชื่ออื่นให้ระบุ)
+    ports:
+      - "3000:3000"  
+    env_file:
+      - ./backend/.env
+    networks:
+      - Mynetwork
+
+  vue:
+    build:
+      context: ./frontend   
+      dockerfile: Dockerfile
+    ports:
+      - "5173:80"  #เปิดport 8080 เเล้วจะ link ไปยัง 80 ที่ built ไว้
+    networks:
+      - Mynetwork
+
+networks:
+  Mynetwork:
+    driver: bridge
+
+volumes:
+  mongo-data:

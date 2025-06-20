@@ -28,7 +28,7 @@ export class Product {
     price: string;
 
     @Prop({ required: true })
-    addBy: string;
+    addedBy: string;
 
     @Prop()
     imgPath: string;

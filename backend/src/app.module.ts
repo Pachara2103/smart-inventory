@@ -12,7 +12,7 @@ import { ProductModule } from './product/product.module';
       envFilePath: '.env',
     }),
     MongooseModule.forRoot(
-      'mongodb://localhost:27019', {
+     'mongodb://mongo_new:27017', {
       user: process.env.MONGO_USER,
       pass: process.env.MONGO_PASS,
       dbName: 'inventory',

@@ -16,9 +16,9 @@ export class AuthService {
         @InjectModel(User.name) private userModel: Model<UserDocument>,
     ) { }
 
-    async validateUser(email: string, pass: string): Promise<any> {
+    async validateUser(email: string, googleId: string): Promise<any> {
         const user = await this.usersService.findByEmail(email);
-        if (user && (await bcrypt.compare(pass, user.password))) {
+        if (user && (await bcrypt.compare(googleId, user.googleId))) {
             const result = user.toObject();
             console.log(result);
             return {

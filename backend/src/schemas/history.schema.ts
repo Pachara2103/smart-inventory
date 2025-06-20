@@ -25,6 +25,9 @@ export class History {
     unit: string;
 
     @Prop()
+    price: string;
+
+    @Prop()
     description: string;
 
     @Prop()

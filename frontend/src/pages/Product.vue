@@ -145,7 +145,8 @@ const goToPage = (page) => {
     <RouterLink to="/Product/Add" class="tab-box">
       <div style="cursor: pointer; position: relative; width: 100%; height: 100%;">
         <label style="cursor: pointer; font-size:30px; position: absolute; left: 0; bottom: 2px;">+</label>
-        <label style="cursor: pointer; font-size:16px; position: absolute; left: 22px; top: 6px;">Add New Product</label>
+        <label style="cursor: pointer; font-size:16px; position: absolute; left: 22px; top: 6px;">Add New
+          Product</label>
 
       </div>
 
@@ -153,17 +154,17 @@ const goToPage = (page) => {
 
     <div class="search">
       <img :src="searchIcon" width=40 height=40 style="margin-right: 5px;">
-      <select v-model="searchType">
+      <select v-model="searchType" style="  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+">
         <option value="name">Name</option>
         <option value="sku">Sku</option>
         <option value="category">Category</option>
       </select>
-      <input type="search" v-model="searchValue" placeholder="Search..." style="width: 340px;"
-        @keyup.enter="handleSearch" />
-      <button @click="handleSearch">Enter</button>
+      <input type="search" v-model="searchValue" placeholder="Search..." style="width: 340px; border-radius: 5px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3); border: none; outline: none;" @keyup.enter="handleSearch" />
+      <button @click="handleSearch" style="box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3); width: auto;">Enter</button>
     </div>
 
-    <table class="product-table">
+    <table class="product-table" >
       <thead>
         <tr>
           <th>Product</th>
@@ -178,11 +179,11 @@ const goToPage = (page) => {
       </thead>
       <tbody>
         <tr v-for="(product, index) in pageProduct" :key="index">
-          <td style="width: 210px;">
-            <div style="flex-direction: row; display: flex; justify-content: center; align-items: center; gap: 10px;">
+          <td style="width: 180px;">
+            <div style="flex-direction: row; display: flex; justify-content: flex-start; align-items: center; gap: 10px;">
 
               <div style="width: 50px; height: 50px;">
-                <img :src="`http://localhost:3000/images/${product.imgPath}`" style="width: 100%; height: 100%;">
+                <img :src="`http://localhost:3000/images/${product.sku}.png`" style="width: 100%; height: 100%;">
               </div>
 
               {{ product.name }}
@@ -195,12 +196,12 @@ const goToPage = (page) => {
           <td style="width: 100px;">{{ product.quantity }}</td>
           <td style="width: 100px;">{{ product.unit }}</td>
           <td style="width: 100px;">{{ product.price }}</td>
-          <td style="width: 100px;">{{ product.addBy }}</td>
+          <td style="width: 100px;">{{ product.addedBy }}</td>
           <td style="width: 180px;">
             <button @click="openAction(index, 'add')"
-              :style="{ background: currentIndex === index && isAdd === true ? '#02be1c' : '' }">ADD</button>
+              :style="{ background: currentIndex === index && isAdd === true ? '#02be1c' : '', width:'auto' }">ADD</button>
             <button @click="openAction(index, 'req')"
-              :style="{ background: currentIndex === index && isAdd === false ? '#02be1c' : '', marginLeft: '10px' }">REQ</button>
+              :style="{ background: currentIndex === index && isAdd === false ? '#02be1c' : '', marginLeft: '10px' , width:'auto' }">REQ</button>
 
 
             <div v-if="isAdd === true && currentIndex === index" class="popover">
@@ -214,11 +215,10 @@ const goToPage = (page) => {
               <label>Description:</label>
               <input type="text" v-model="actionData.description" />
 
-              <div>
-                <button @click="submitAdd(product)">Submit</button>
-                <button @click="closeAction()" style="margin-left: 5px;">Cancel</button>
+              <div style="padding-top: 10px;">
+                <button @click="submitAdd(product)" style="width: auto;">Submit</button>
+                <button @click="closeAction()" style="margin-left: 5px; width: auto;">Cancel</button>
               </div>
-
 
             </div>
 
@@ -234,10 +234,9 @@ const goToPage = (page) => {
               <input type="text" v-model="actionData.description" />
 
 
-              <div>
-                <button @click="submitReq(product)">Submit</button>
-                <button @click="closeAction()" style="margin-left: 5px;">Cancel</button>
-
+              <div style="padding-top: 10px;">
+                <button @click="submitReq(product)" style="width: auto;">Submit</button>
+                <button @click="closeAction()" style="margin-left: 5px; width: auto;">Cancel</button>
               </div>
 
             </div>
@@ -246,9 +245,9 @@ const goToPage = (page) => {
       </tbody>
     </table>
 
-    <div style="margin-top: 20px; position: absolute; bottom: 0;">
+    <div style="margin-top: 20px; position: absolute; bottom: 0px; width: auto; justify-content: center; display: flex; align-items: center;">
       <button v-for="page in totalPages" :key="page" @click="goToPage(page)"
-        :style="{ marginRight: '5px', background: page === currentPage ? '#FF6F3C' : '#999999' }">
+        :style="{ marginRight: '5px', background: page === currentPage ? '#FF6F3C' : '#999999'}" style="width: 35px; justify-content: center; align-items: center; display: flex;">
         {{ page }}
       </button>
     </div>
@@ -265,7 +264,6 @@ const goToPage = (page) => {
   display: flex;
   flex-direction: column;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background-color: #f8f9f9;
   align-items: center;
   border-radius: 10px;
 }
@@ -282,7 +280,8 @@ const goToPage = (page) => {
   border-collapse: collapse;
   background-color: #fff;
   border: 1px solid #ccc;
-
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  /* background-color: #ccc; */
 }
 
 .product-table thead {
@@ -301,7 +300,7 @@ const goToPage = (page) => {
 .product-table td {
   position: relative;
   padding: 12px 15px;
-  border-bottom: 1px solid #ddd;
+  /* border-bottom: 1px solid #ddd; */
   border: 1px solid #ccc;
   text-align: center;
 }
@@ -326,18 +325,14 @@ const goToPage = (page) => {
 
 .popover {
   position: absolute;
-  top: 15px;
-  left: 160px;
-  width: 170px;
+  top: 70px;
+  left: 0;
+  width: 180px;
   border: 2px solid #dedede;
   padding: 15px;
   z-index: 100;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-  margin-top: 5px;
-
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
   flex-direction: column;
-
-  justify-content: center;
   align-items: center;
   display: flex;
 
@@ -347,7 +342,14 @@ const goToPage = (page) => {
 .popover input {
   display: block;
   margin: 5px 0;
-  width: 120px;
+  width: 150px;
+  height: 30px;
+  border-radius: 5px;
+  outline: none;
+  border: none;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+  font-size: 15px;
+
 }
 
 .search select {
@@ -371,6 +373,8 @@ const goToPage = (page) => {
   display: flex;
 
   background-color: rgb(250, 134, 26);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+
   color: rgb(255, 255, 255);
   text-decoration: none;
   cursor: pointer;

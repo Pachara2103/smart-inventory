@@ -39,7 +39,7 @@ export class ProductController {
         @Body() productDto: ProductDto,
     ) {
         // console.log('Uploaded file info:', file.filename);
-        productDto.imgPath = file ? file.filename : null;
+        productDto.imgPath = file ? file.filename : `${productDto.sku}.png`;
 
         return this.productService.creatProduct(productDto);
     }
@@ -57,6 +57,11 @@ export class ProductController {
      @Get('getallhistory')
     getAllHistory(@Request() req) {
         return this.productService.getAllHistory();
+    }
+
+    @Get('getallrecenlyaddedproduct')
+    getAllRecenlyAddedProduct(@Request() req) {
+        return this.productService.getAllRecenlyAddedProduct();
     }
 
     @Get('getproduct')
@@ -82,6 +87,10 @@ export class ProductController {
     @Get('sale')
     async saleProduct(@Query() r: any) {
         return this.productService.getSaleProduct();
+    }
+     @Get('allsale')
+    async allsaleProduct(@Query() r: any) {
+        return this.productService.getAllSaleProduct();
     }
 
     @Get('sale/selectcategory')

@@ -9,28 +9,24 @@ export class User {
   @Prop({ required: true, unique: true })
   email: string;
 
-  @Prop() //use google email
-  password: string;
-
   @Prop({ required: true })
   name: string;
 
   @Prop({ required: true })
-  googleId: string;
-
-  @Prop({ required: true })
-  userType: string;
-
-  @Prop()
   picture: string;
 
+  @Prop({ required: true })
+  googleId: string;
+
+  @Prop()
+  userType: string;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
 
-UserSchema.pre('save', async function (next) {
-  if (this.isModified('password')) {
-    this.password = await bcrypt.hash(this.password, 10);
-  }
-  next();
-});
+// UserSchema.pre('save', async function (next) {
+//   if (this.isModified('password')) {
+//     this.password = await bcrypt.hash(this.password, 10);
+//   }
+//   next();
+// });

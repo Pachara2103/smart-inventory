@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, watch } from 'vue'
+import { ref, onMounted, watch, computed } from 'vue'
 import axios from 'axios'
 import upload from '@/images/icons/upload.png'
 
@@ -14,6 +14,10 @@ const product = ref({
     addedBy: ''
 })
 
+
+const canSubmit = computed(() => {
+    return Object.values(product.value).every(value => value !== '')
+})
 
 onMounted(async () => {
     try {
@@ -69,42 +73,46 @@ function DeleteImage() {
     fileInput.value.value = null
 }
 
-async function sendData() {
-    try {
-        const formData = new FormData()
-        formData.append('sku', product.value.sku)
-        formData.append('name', product.value.name)
-        formData.append('category', product.value.category)
-        formData.append('quantity', product.value.quantity)
-        formData.append('unit', product.value.unit)
-        formData.append('price', product.value.price)
-        formData.append('addedBy', product.value.addBy)
 
-        if (uploadImage.value) {
-            formData.append('image', ImagetoStore.value) // 'image' ต้องตรงกับ NestJS FileInterceptor
+async function sendData(canSubmit) {
+    if (canSubmit) {
+        try {
+            const formData = new FormData()
+            formData.append('sku', product.value.sku)
+            formData.append('name', product.value.name)
+            formData.append('category', product.value.category)
+            formData.append('quantity', product.value.quantity)
+            formData.append('unit', product.value.unit)
+            formData.append('price', product.value.price)
+            formData.append('addedBy', product.value.addedBy)
+
+            if (uploadImage.value) {
+                formData.append('image', ImagetoStore.value) // 'image' ต้องตรงกับ NestJS FileInterceptor
+            }
+
+            const res = await axios.post('http://localhost:3000/product/creat', formData)
+            console.log('Upload success', res.data)
+            console.log('formData= ', formData)
+            alert('Product added successfully!!!')
+
+            // product.value = {
+            //     sku: '',
+            //     name: '',
+            //     category: '',
+            //     quantity: '',
+            //     unit: '',
+            //     price: '',
+            //     addedBy: ''
+            // }
+            // DeleteImage()
+
+        } catch (error) {
+            console.error('Upload failed:', error)
+            alert('Upload failed!')
         }
-
-        const res = await axios.post('http://localhost:3000/product/creat', formData)
-
-        console.log('Upload success', res.data)
-        console.log('formData= ', formData)
-        alert('Product added successfully!')
-
-        // เคลียร์ฟอร์ม
-        // product.value = {
-        //     sku: '',
-        //     name: '',
-        //     category: '',
-        //     quantity: '',
-        //     unit: '',
-        //     price: '',
-        //     addBy: ''
-        // }
-        // DeleteImage()
-
-    } catch (error) {
-        console.error('Upload failed:', error)
-        alert('Upload failed!')
+    }
+    else {
+        alert('Please fill information!!!')
     }
 }
 
@@ -112,10 +120,10 @@ async function sendData() {
 
 <template>
     <div class="container">
-        <!-- <div class="topic">
-            ADD Product
-            <div style="font-size: small;">Create new product</div>
-        </div> -->
+        <label
+            style="position: absolute; top:80px; font-weight: bold; font-size: 30px;text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3); ">
+            ADD NEW PRODUCT</label>
+
 
         <div class="add-container">
             <div class="add-box">
@@ -133,7 +141,7 @@ async function sendData() {
                 <select v-model="product.category">
                     <option disabled value="">select category</option>
                     <option value="Fruit">Fruit</option>
-                    <option value="Mobile">Mobile</option>
+                    <option value="Phone">Phone</option>
                 </select>
             </div>
 
@@ -143,7 +151,7 @@ async function sendData() {
             </div>
 
             <div
-                style="  background-color: aquamarine;display: flex;flex-direction: row;justify-content: flex-start;width: 370px; position: absolute;top: 200px;">
+                style=" display: flex;flex-direction: row;justify-content: flex-start;width: 370px; position: absolute;top: 200px;">
                 <div style="flex-direction: column; display: flex; height: 100%; width: 50%;">
                     <label>Price</label>
                     <input type="number" step="0.01" v-model="product.price" style="width: 75%;" />
@@ -162,7 +170,7 @@ async function sendData() {
 
             <div class="add-box" style="position: absolute;top: 300px;">
                 <label>Added By</label>
-                <input type="text" v-model="product.addedBy" style="width: 95%;" readonly />
+                <input type="text" v-model="product.addedBy" style="width: 95%;" />
             </div>
 
             <div class="add-box" style="position: absolute;top: 200px; right: 75px;">
@@ -183,11 +191,11 @@ async function sendData() {
 
             <div>
                 <button v-if="uploadImage" @click="DeleteImage"
-                    style="position: absolute; bottom: 0; background-color: red;"> Delete</button>
+                    style="position: absolute; bottom: 130px; right: 80px; background-color: red;"> Delete Img</button>
             </div>
 
             <div>
-                <button v-if="uploadImage" @click="sendData" class="add-button">Submit Product</button>
+                <button @click="sendData(canSubmit)" class="add-button">Submit Product</button>
             </div>
 
         </div>
@@ -196,7 +204,7 @@ async function sendData() {
 
 <style scoped>
 .add-box {
-    background-color: aquamarine;
+    /* background-color: aquamarine; */
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
@@ -205,12 +213,13 @@ async function sendData() {
 }
 
 .container {
+    position: relative;
     align-items: center;
     justify-content: center;
     display: flex;
 
-    background-color: burlywood;
-    width: 100%;
+    /* background-color: rgb(255, 163, 43); */
+    /* width: 100%; */
     height: 100vh;
     margin-left: 0%;
 }
@@ -225,7 +234,7 @@ async function sendData() {
     position: relative;
     width: 110vh;
     height: 55vh;
-    background-color: white;
+    /* background-color: rgb(255, 4, 4); */
     padding: 20px;
     gap: 15px;
     border-radius: 10px;
@@ -233,10 +242,13 @@ async function sendData() {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
+    /* border: 2px solid #c6c6c6; */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+
 }
 
 .add-container select {
-    width: 42vh;
+    width: 50vh;
     padding: 8px 12px;
     font-size: 1rem;
     border: 1px solid #ccc;
@@ -255,23 +267,35 @@ async function sendData() {
 }
 
 .add-container input {
-    width: 40vh;
-    margin-top: 10px;
+  font-size: 17px;
+  width: 40vh;
+  margin-top: 10px;
+  height: 35px; /* สูงขึ้นหน่อย */
+  padding: 0 12px; /* เว้นขอบด้านใน */
+  border-radius: 8px; /* มุมโค้งนุ่มกว่า */
+  border: 1px solid #ccc; /* สีขอบเทาอ่อน */
+  outline: none;
+  transition: all 0.2s ease; 
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1); /* เงาเบาๆ */
+}
+
+.add-container input:focus {
+  border-color: #000000; /* สีฟ้าตอนโฟกัส */
+  box-shadow: 0 0 0 3px rgba(71, 149, 217, 0.2); /* เงาสีฟ้าอ่อน */
 }
 
 
 .area-img {
     position: absolute;
-    left: 22%;
-    width: 200px;
-    height: 200px;
+    left: 25%;
+    width: 150px;
+    height: 150px;
     border: 2px dashed #aaa;
     border-radius: 20px;
     display: flex;
     align-items: center;
     justify-content: center;
     margin-top: 20px;
-    /* color: #777; */
     cursor: pointer;
     overflow: hidden;
     transition: border-color 0.3s ease;

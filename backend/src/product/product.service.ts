@@ -22,6 +22,7 @@ export class ProductService {
             sku: productDto.sku,
             category: productDto.category,
             quantity: productDto.quantity,
+            price: productDto.price,
             unit: productDto.unit,
             description: `create new product`,
             action: `New`
@@ -36,7 +37,10 @@ export class ProductService {
     }
 
     async getAllHistory(): Promise<HistoryDocument[] | null> {
-        return this.historyModel.find().exec();
+        return this.historyModel.find().sort({createdAt:-1}).exec();
+    }
+    async getAllRecenlyAddedProduct(): Promise<HistoryDocument[] | null> {
+        return this.historyModel.find({action:"New"}).sort({createdAt:-1}).exec();
     }
 
     async getProduct(q: any) {
@@ -121,8 +125,25 @@ export class ProductService {
                 }
             }
         ]);
-        console.log("sale", sale)
+
+
         return sale;
+    }
+    async getAllSaleProduct() {
+         const allsale = await this.historyModel.aggregate([
+            {
+                $match: { action: "Req" }
+
+            },
+            {
+                $group: {
+                     _id: null, 
+                    quantity: { $sum: "$quantity" },
+                }
+            }
+        ]);
+
+      return allsale[0]?.quantity || 0 ;
     }
 
     async saleSelectCategory(category: string) {

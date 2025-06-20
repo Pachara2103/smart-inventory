@@ -74,6 +74,11 @@ const goToPage = (page) => {
   }
 };
 
+// const formattedCreatedAt= (data) =>{
+//   const str = data.slice(0, 16).replace('T', ' ');
+//   return str.replace(':', '.'); 
+// };
+
 </script>
 
 <template>
@@ -82,7 +87,7 @@ const goToPage = (page) => {
 
     <div class="search">
       <img :src="searchIcon" width=40 height=40 style="margin-right: 5px;">
-      <select v-model="searchType">
+      <select v-model="searchType" style="  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);">
         <option value="name">Name</option>
         <option value="sku">Sku</option>
         <option value="category">Category</option>
@@ -90,9 +95,9 @@ const goToPage = (page) => {
         <option value="user">User</option>
 
       </select>
-      <input type="search" v-model="searchValue" placeholder="Search..." style="width: 340px;"
-        @keyup.enter="handleSearch" />
-      <button @click="handleSearch">Enter</button>
+            <input type="search" v-model="searchValue" placeholder="Search..." style="width: 340px; border-radius: 5px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3); border: none; outline: none;" @keyup.enter="handleSearch" />
+
+      <button @click="handleSearch" style="  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2); width: auto;">Enter</button>
     </div>
 
     <table class="product-table">
@@ -106,12 +111,13 @@ const goToPage = (page) => {
           <th>Action</th>
           <th>User</th>
           <th>Description</th>
+          <th>Time</th>
         </tr>
       </thead>
       <tbody>
         <tr v-for="(product, index) in pageProduct" :key="index">
-          <td style="width: 210px;">
-            <div style="flex-direction: row; display: flex; justify-content: center; align-items: center; gap: 10px;">
+          <td style="width: 180px;">
+            <div style="flex-direction: row; display: flex; justify-content: flex-start; align-items: center; gap: 10px;">
 
               <div style="width: 50px; height: 50px;">
                 <img :src="`http://localhost:3000/images/${product.sku}.png`" style="width: 100%; height: 100%;">
@@ -128,15 +134,17 @@ const goToPage = (page) => {
           <td style="width: 80px;">{{ product.unit }}</td>
 
           <td style="width: 80px;">{{ product.action }}</td>
-          <td style="width: 150px;">{{ product.user }}</td>
+          <td style="width: 150px;">admin</td>
           <td style="width: 250px;">{{ product.description }}</td>
+          <td style="width: 150px;"> {{ product.createdAt.slice(0, 10) }}</td>
+
         </tr>
       </tbody>
     </table>
 
     <div style="margin-top: 20px; position: absolute; bottom: 0;">
       <button v-for="page in totalPages" :key="page" @click="goToPage(page)"
-        :style="{ marginRight: '5px', background: page === currentPage ? '#FF6F3C' : '#999999' }">
+        :style="{ marginRight: '5px', background: page === currentPage ? '#FF6F3C' : '#999999', width:'auto' }">
         {{ page }}
       </button>
     </div>
@@ -147,15 +155,19 @@ const goToPage = (page) => {
 
 <style scoped>
 .product-container {
+  /* justify-content: center;
+  display: flex; */
   width: auto;
   height: 98vh;
   position: relative;
   display: flex;
   flex-direction: column;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background-color: #f8f9f9;
+
   align-items: center;
-  border-radius: 10px;
+  margin-left: 20px;
+  /* justify-content: center; */
+  /* border-radius: 10px; */
 }
 
 .search {
@@ -169,8 +181,8 @@ const goToPage = (page) => {
   width: 100%;
   border-collapse: collapse;
   background-color: #fff;
-  border: 1px solid #ccc;
-
+  /* border: 1px solid #ccc; */
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2)
 }
 
 .product-table thead {

@@ -11,9 +11,7 @@ export class AuthController {
     @Post('login')
     async login(@Request() req, @Res({ passthrough: true }) res) {
         const access_token = await this.authService.login(req.user);
-        // return access_token;
 
-        //save to cookies
         res.cookie('access_token', access_token, {
             httpOnly: true,
             sameSite: 'strict',
@@ -23,16 +21,16 @@ export class AuthController {
         return 'Login Successful';
     }
 
+
     @Get('google/signin')
     @UseGuards(GoogleAuthGuard)
     async googleAuth(@Request() req) {
-        // Initiates the Google OAuth process
     }
 
     @Get('google/callback')
     @UseGuards(GoogleAuthGuard)
     async googleAuthRedirect(@Request() req, @Res() res) {
-        console.log('req = ', req.user)
+        // console.log('req = ', req.user)
         const { accessToken } = await this.authService.googleLogin(req);
         res.cookie('access_token', accessToken, {
             httpOnly: true, //httpOnly cookie ถูกป้องกันไม่ให้ JavaScript หรือ DevTools อ่านหรือแก้ไขโดยตรง (เพื่อความปลอดภัย
@@ -40,8 +38,9 @@ export class AuthController {
             secure: false,
             path: '/',
         });
+
         res.redirect('http://localhost:5173/Dashboard');
-    
+
     }
 
 

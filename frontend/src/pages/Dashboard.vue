@@ -7,9 +7,12 @@ import categoryIcon from '@/images/icons/grid.png'
 import saleIcon from '@/images/icons/sales.png'
 import productIcon from '@/images/icons/box.png'
 import { Chart, Title, Tooltip, Legend, ArcElement, BarElement, CategoryScale, LinearScale, Colors } from 'chart.js'
+// import ChartDataLabels from 'chartjs-plugin-datalabels'
+
 Chart.register(Title, Tooltip, Legend, ArcElement, BarElement, CategoryScale, LinearScale)
 
 const AllProduct = ref([])
+const AllHProduct = ref([])
 const ProductByCategory = ref([])
 const category = ref('Fruit')
 const sale = ref([])
@@ -24,12 +27,14 @@ const allSale = ref(0)
 
 onMounted(async () => {
   try {
-    const response = await axios.get('http://localhost:3000/product/getallproduct')
+    const response = await axios.get('http://localhost:3000/product/getallrecenlyaddedproduct')
     const totalCategory = await axios.get('http://localhost:3000/product/getallcategory')
     const totalUser = await axios.get('http://localhost:3000/user/getalluser')
     // ProductByCategory.value = response.data
     SelectCategory()
     AllProduct.value = response.data
+    console.log(' AllProduct.value= ', AllProduct.value)
+
     allProduct.value = AllProduct.value.length
     allUser.value = totalUser.data
     allCategory.value = totalCategory.data
@@ -41,13 +46,22 @@ onMounted(async () => {
 
   try {
     const response = await axios.get('http://localhost:3000/product/sale')
+    const AllSale = await axios.get('http://localhost:3000/product/allsale')
     // ProductByCategory.value = response.data
     sale.value = response.data
-    allSale.value = sale.value.length
-    console.error('sale:', sale.value)
+    allSale.value = AllSale.data
 
   } catch (error) {
     console.error('Error fetching sale:', error)
+  }
+
+  try {
+    const response = await axios.get('http://localhost:3000/product/getallhistory')
+    AllHProduct.value = response.data
+    console.log('All product in history = ', AllHProduct._rawValue)
+
+  } catch (error) {
+    console.error('Error fetching products:', error)
   }
 });
 const chartData = computed(() => ({
@@ -74,7 +88,8 @@ const chartOptions = ref({
           size: 14, // ขนาด font
         }
       }
-    },
+    }
+
   }
 })
 
@@ -149,14 +164,20 @@ watch(() => saleCategory.value, () => {
   SaleSelectCategory()
 })
 
-// watch(() => AllProduct.value, () => {
-//   size.value = AllProduct.value.length
-// })
+
 
 watch([sortby, asc], () => {
   sortType()
   console.log('call sortType', 'asc= ', asc._rawValue, sortby._rawValue)
 })
+
+const HProduct = computed(() => {
+  return AllHProduct.value.slice(0, 10);
+});
+
+const Product = computed(() => {
+  return AllProduct.value.slice(0, 10);
+});
 
 
 
@@ -166,7 +187,8 @@ watch([sortby, asc], () => {
   <div class="container">
     <div class="col1">
       <div>
-        <div style="width: 250px;height:80px; background-color:white; border-radius: 10px; position: relative;">
+        <div style="width: 250px;height:80px; background-color:white; border-radius: 10px; position: relative;   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+">
           <img :src="group" width="50" height="50" style="position: absolute; right: 25px;">
 
           <div
@@ -178,7 +200,8 @@ watch([sortby, asc], () => {
       </div>
 
       <div>
-        <div style="width: 250px;height:80px; background-color:white; border-radius: 10px; position: relative;">
+        <div style="width: 250px;height:80px; background-color:white; border-radius: 10px; position: relative;   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+">
           <img :src="categoryIcon" width="50" height="50" style="position: absolute; right: 25px;">
 
           <div
@@ -190,7 +213,8 @@ watch([sortby, asc], () => {
       </div>
 
       <div>
-        <div style="width: 250px;height:80px; background-color:white; border-radius: 10px; position: relative;">
+        <div style="width: 250px;height:80px; background-color:white; border-radius: 10px; position: relative;   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+">
           <img :src="saleIcon" width="50" height="50" style="position: absolute; right: 25px;">
           <div
             style="flex-direction: column; background-color: white; width: 110px; height: 40px; position: absolute; left: 40px;">
@@ -201,7 +225,8 @@ watch([sortby, asc], () => {
       </div>
 
       <div>
-        <div style="width: 250px;height:80px; background-color:white; border-radius: 10px; position: relative;">
+        <div style="width: 250px;height:80px; background-color:white; border-radius: 10px; position: relative;  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+">
           <img :src="productIcon" width="50" height="50" style="position: absolute; right: 25px;">
 
           <div
@@ -227,21 +252,21 @@ watch([sortby, asc], () => {
         <select v-model="saleCategory" class="select">
           <option value="All">All Category</option>
           <option value="Fruit">Fruit</option>
-          <option value="Mobile">Mobile</option>
+          <option value="Phone">Phone</option>
         </select>
 
       </div>
 
       <div class="circle-graph">
-        <label style="position: absolute; top: 10px; font-weight: bold;"> Detail</label>
+        <label style="position: absolute; top: 10px; font-weight: bold;"> Remaining Products</label>
         <div style="width: 80%; height: 80%; padding-top: 20px;">
-          <Pie :data="chartData" :options="chartOptions" />
+          <Pie :data="chartData" :options="chartOptions"  />
         </div>
 
         <select v-model="category" class="select">
           <option disabled value="">category</option>
           <option value="Fruit">Fruit</option>
-          <option value="Mobile">Mobile</option>
+          <option value="Phone">Phone</option>
         </select>
 
 
@@ -251,27 +276,27 @@ watch([sortby, asc], () => {
     </div>
     <div class="col3">
       <div class="added">
-        <label>Recently Added Product</label>
+        <label style=" font-weight: bold; margin-bottom: 8px;">Recently Added Product</label>
         <div class="table-header">
           <table>
             <thead>
               <tr>
                 <th>No</th>
-                <th>SKU</th>
-                <th>Name</th>
+                <th>Product</th>
+                <th>Sku</th>
                 <th>Price</th>
               </tr>
             </thead>
 
             <tbody>
-              <tr v-for="(product, index) in AllProduct" :key="product._id">
+              <tr v-for="(product, index) in Product" :key="product._id">
                 <td>{{ index + 1 }}</td>
                 <td>
                   <div
                     style="flex-direction: row; display: flex; justify-content: center; align-items: center; gap: 10px;">
 
                     <div style="width: 30px; height: 30px;">
-                      <img :src="`http://localhost:3000/images/${product.imgPath}`" style="width: 100%; height: 100%;">
+                      <img :src="`http://localhost:3000/images/${product.sku}.png`" style="width: 100%; height: 100%;">
                     </div>
 
                     {{ product.name }}
@@ -286,33 +311,57 @@ watch([sortby, asc], () => {
 
           </table>
         </div>
-
-        <div
-          style="position: absolute;top: 10px;right: 10px; width: 150px; height: 20px; flex-direction: row; display: flex;">
-          <!-- <label style="margin-right: 50px;"> Sort By</label> -->
-          <svg @click="pressUp(true)" :style="{ fill: asc === true ? 'green' : 'black', cursor: 'pointer' }"
-            viewBox="0 0 25 25">
-            <path xmlns="http://www.w3.org/2000/svg"
-              d="M10,24c-1.66,0-3-1.34-3-3V13h-1.92c-1.17,0-2.29-.62-2.8-1.67-.57-1.18-.34-2.51,.57-3.43L9.17,1.18c1.57-1.57,4.09-1.57,5.64-.02,0,0,6.37,6.77,6.37,6.77,.85,.84,1.1,2.09,.63,3.22-.47,1.13-1.52,1.84-2.74,1.85h-2.06v8c0,1.66-1.34,3-3,3h-4Z" />
-          </svg>
-          <svg @click="pressUp(false)" :style="{ fill: asc === true ? 'black' : 'green', cursor: 'pointer' }"
-            viewBox="0 0 25 25">
-            <path xmlns="http://www.w3.org/2000/svg"
-              d="M12,24c-1.02,0-2.03-.39-2.81-1.16l-6.37-6.77c-.85-.85-1.1-2.09-.63-3.22,.47-1.13,1.52-1.84,2.75-1.85h2.06V3c0-1.65,1.35-3,3-3h4c1.65,0,3,1.35,3,3V11h2.06c1.23,0,2.28,.71,2.75,1.85,.47,1.13,.22,2.38-.65,3.24,0,0-6.34,6.74-6.35,6.75-.77,.77-1.79,1.16-2.81,1.16Z" />
-          </svg>
-
-          <select v-model="sortby" style="text-align: center; margin-left: 20px;">
-            <option disabled value="">sort type</option>
-            <option value="date">Date</option>
-            <option value="name">Name</option>
-            <option value="sku">Sku</option>
-            <option value="price">Price</option>
-
-          </select>
-        </div>
       </div>
-    </div>
 
+      <div class="action">
+        <label style=" font-weight: bold; margin-bottom: 8px;">Recently Action</label>
+        <div class="table-header">
+          <table>
+            <thead>
+              <tr>
+                <th>No</th>
+                <th>Product</th>
+                <th>Quantity</th>
+                <th>Unit</th>
+                <th>Action</th>
+                <th>User</th>
+                <th>Description</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              <tr v-for="(product, index) in HProduct" :key="product._id">
+                <td style="width: 30px;">{{ index + 1 }}</td>
+                <td style="width: 150px;">
+                  <div
+                    style="flex-direction: row; display: flex; justify-content: flex-start; align-items: center; gap: 10px;">
+
+                    <div style="width: 30px; height: 30px;">
+                      <img :src="`http://localhost:3000/images/${product.sku}.png`" style="width: 100%; height: 100%;">
+                    </div>
+
+                    {{ product.name }}
+
+                  </div>
+
+                </td>
+
+                <td style="width: 80px;">{{ product.quantity }}</td>
+                <td style="width: 80px;">{{ product.unit }}</td>
+
+                <td style="width: 80px;">{{ product.action }}</td>
+                <td style="width: 150px;">admin</td>
+                <td style="width: 250px;">{{ product.description }}</td>
+              </tr>
+            </tbody>
+
+          </table>
+        </div>
+
+      </div>
+
+
+    </div>
 
   </div>
 
@@ -323,7 +372,7 @@ watch([sortby, asc], () => {
   width: 100%;
   display: flex;
   flex-direction: column;
-  background-color: rgb(220, 251, 251);
+  /* background-color: rgb(220, 251, 251); */
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   margin-left: 0;
 }
@@ -357,12 +406,11 @@ watch([sortby, asc], () => {
 }
 
 .col3 {
-  background-color: rgb(109, 212, 80);
   width: 100%;
   height: auto;
-
   justify-content: center;
   display: flex;
+  gap: 30px;
 
 }
 
@@ -370,19 +418,28 @@ watch([sortby, asc], () => {
   position: relative;
   background: white;
   width: 30%;
-  height: 35vh;
+  height: 50vh;
   padding: 10px;
   border-radius: 8px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
   overflow: hidden;
   display: flex;
   flex-direction: column;
 }
 
-.added label {
-  font-weight: bold;
-  margin-bottom: 8px;
+.action {
+  position: relative;
+  background: white;
+  width: 60%;
+  height: 50vh;
+  padding: 10px;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
+
 
 .table-header {
   flex: 1 1 auto;
@@ -406,7 +463,8 @@ watch([sortby, asc], () => {
 .table-header thead th {
   position: sticky;
   top: 0;
-  background: #f0f0f0;
+  background: #4297ff;
+  color: #ffffff;
   z-index: 1;
 }
 
@@ -430,7 +488,9 @@ watch([sortby, asc], () => {
   justify-content: center;
   align-items: center;
   border-radius: 15px;
-  border: 2px solid #d8d7d7;
+  /* border: 2px solid #d8d7d7; */
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+
 }
 
 .sale {
@@ -443,7 +503,9 @@ watch([sortby, asc], () => {
   justify-content: center;
   align-items: center;
   border-radius: 15px;
-  border: 2px solid #d8d7d7;
+  /* border: 2px solid #d8d7d7; */
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+
 
 }
 
