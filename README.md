@@ -89,3 +89,11 @@ src/
 ├── app.module.ts
 └── main.ts
 
+## About The Project
+
+This is my first pesonal project using Nest.js, Vue.js and terraform and this project is made for practicing in Nest.js, Vue.js and terraform.
+
+This project เกี่ยวกับ
+
+
+
