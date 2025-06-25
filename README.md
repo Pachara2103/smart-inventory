@@ -73,6 +73,8 @@ This is my first personal project using Nest.js, Vue.js, and Terraform. It was c
 - เพิ่มระบบ login ให้หลากหลาย โดยที่ไม่ได้มีเเค่ google login
 - Deploy ด้วย CI/CD
 
+### Contact
+- Gmail: patcharaauikim3800@gmail.com
 
 
 
