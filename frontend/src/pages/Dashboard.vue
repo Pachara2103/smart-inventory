@@ -314,7 +314,7 @@ const Product = computed(() => {
       </div>
 
       <div class="action">
-        <label style=" font-weight: bold; margin-bottom: 8px;">Recently Action</label>
+        <label style=" font-weight: bold; margin-bottom: 8px;">Recent Action</label>
         <div class="table-header">
           <table>
             <thead>

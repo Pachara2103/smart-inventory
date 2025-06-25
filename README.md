@@ -1,99 +1,84 @@
-<p align="center">
- My Plan
-</p>
-<li>ศึกษาวิธีการใช้ Nestjs and Vue </li>
-<li>ออกเเบบโครงสร้างต่างๆของ project </li>
-<li>สร้าง frontend, backend</li>
-<li>ศึกษา + ทำ Dockerize ทั้งระบบ & Deploy บน K8s * </li>
-<li>เขียน Helm + Terraform *</li>
-<li>*= ถ้าไหว</li>
-
-#ศึกษาวิธีทำ Login register with Nestjs & using mongo  from Youtube Channel  testing API by using postman
-#ศึกษาการใช้ vue frontend
-
-โครงสร้างระบบ (Vue + NestJS + MongoDB)
-Frontend (Vue.js)
- -Login Page	    เข้าสู่ระบบด้วย username/password
- -Dashboard	        สรุปจำนวนสินค้า, กราฟสต็อก
- -Product List	    ดูรายการสินค้า, กดดูรายละเอียด
- -Add/Edit Product	เพิ่มหรือแก้ไขข้อมูลสินค้า
- -Stock Movement	บันทึกการเติม/เบิกสินค้า
- -Movement History	ดูประวัติการเคลื่อนไหวของสินค้า
- -User Management 	จัดการบัญชีพนักงาน(เฉพาะ Admin)
- -Profile / Logout	ข้อมูลส่วนตัว
-
-Backend (NestJS)
-auth	    /auth/login	        เข้าสู่ระบบ
-users	    /users	            จัดการผู้ใช้ (admin-only)
-products    /products	        CRUD สินค้า
-stock	    /stock/add,remove	เติม/เบิกสินค้า
-history	    /history	        ดูประวัติ stock movement
-dashboard	/dashboard/summary	แสดงจำนวนสินค้า, ยอดรวม
-
-MongoDB
-- users
-  - _id
-  - username
-  - passwordHash
-  - role: 'admin' | 'staff'
-
-- products 
-  - sku : unique ex.PT001
-  - name + picture
-  - category 
-  - quantity
-  - unit : kg, pieace
-  - price
-  - add by
-  + edit, delete
-  ///add time, expire
-
-- stock_movements
-  - _id
-  - product_id
-  - type: 'add' | 'remove'
-  - amount
-  - note
-  - created_by
-  - created_at
-
-
-Frontend
-src/
-├── components/
-├── pages/
-│   ├── Login.vue
-│   ├── Dashboard.vue
-│   ├── Product.vue
-│   ├── AddProduct.vue
-│   ├── StockMovement.vue
-│   ├── History.vue
-│   └── UserManagement.vue
-├── router/
-├── store/
-├── services/  # เรียก API
-└── App.vue
-
-Backend
-src/
-├── auth/
-│   ├── auth.controller.ts
-│   ├── auth.service.ts
-│   └── jwt.strategy.ts
-├── users/
-├── products/
-├── stock/
-├── history/
-├── dashboard/
-├── common/  # guards, interceptors, decorators
-├── app.module.ts
-└── main.ts
-
 ## About The Project
+This is my first personal project using Nest.js, Vue.js, and Terraform. It was created for the purpose of practicing with these. The project, Smart Inventory, is an inventory management system where users can request and add products. It also includes a dashboard that displays product sales, product categories, and other data through graphs. Additionally, there are Product and History pages, which show all products and the actions taken by users, respectively.
 
-This is my first pesonal project using Nest.js, Vue.js and terraform and this project is made for practicing in Nest.js, Vue.js and terraform.
+### 🛠 Tech Stack
+- Backend: [NestJS](https://nestjs.com/)
+- Frontend: [Vue.js 3](https://vuejs.org/)
+- Infrastructure as Code: [Terraform](https://www.terraform.io/)
+- Database: MongoDB
+- Others: Docker, Docker Compose, Github
 
-This project เกี่ยวกับ
+## Smart Inventory
+### Login
+<p align="center">
+  <img src="./screenshots/login.png" alt="Login Screenshot" width="48%" style="margin-right:20px;"/>
+  <img src="./screenshots/google.png" alt="Login Screenshot" width="48%" />
+</p>
+
+#### ✨ Features
+- Support Google login
+- Implement JWT authentication with cookie validation for protected routes
+
+### Dashboard
+![Dashboard Screenshot](./screenshots/dashboard.png)
+#### ✨ Features
+- Display sales and remaining products through graphs
+- Display total users, categories, sales, and products
+- Show recently added products and recent actions in a table
+
+### Product
+![Product Screenshot](./screenshots/product.png)
+#### ✨ Features
+- View all products in a table
+- Search for products using keywords
+
+### Add Product
+![AddProduct Screenshot](./screenshots/addproduct.png)
+#### ✨ Features
+- Add a new product with an image uploaded and stored on the backend in the format `[sku].png`
+
+### Historry
+![Histort Screenshot](./screenshots/History.png)
+#### ✨ Features
+- View history in a table
+- Search for history using keywords
+
+## 🚀 Getting Started
+#### Using Docker Compose
+ ```sh 
+ git clone https://github.com/Pachara2103/smart-inventory 
+ ```
+  ```sh 
+ cd smart-inventory
+ ```
+  ```sh 
+ docker compose up -d
+ ```
+#### available at http://localhost:5173/
+
+### Challenges
+#### Problem: เนื่องจากเป็นการใช้ NestJS, Vue & Terraform ครั้งเเรก ในช่วงเเรกจึงยากไปหมด
+- Sol. ค่อยๆเรียนรู้ เเละศึกษาวิธีการใช้สิ่งต่างๆจาก Youtube & Chat GPT พอหลังๆ เริ่มเข้าใจอะไรมากขึ้นก็ไปได้ไวขึ้น 
+#### Problem: ปัญหาในการใช้ Docker Compose เชื่อมต่อ MongoDB 
+- Sol. ศึกษาหาตัวอย่างของคนอื่นมาเรียนรู้ เเละปรับใช้กับตัวเอง 
+
+### Lessons Learned
+- เรียนรู้การเชื่อม frontend-backend ด้วย REST API
+- ได้เรียนรู้การใช้ Nestjs ในการทำ Authentication การใช้สื่อสารกับ  frontend เเบบ REST API เเละการเชื่อมกับ MongoDB
+- ได้เรียนรู้การใช้ Vue ในการทำ pages ต่างๆ เเละการสื่อสารกับ backend เเบบ REST API
+- เรียนรู้การใช้ terraform เบื้องต้น
+- เรียนรู้วิธีการเขียน Dockerfile & Docker Compose
+
+### Future Improvements
+- เพิ่มระบบ login ให้หลากหลาย โดยที่ไม่ได้มีเเค่ google login
+- Deploy ด้วย CI/CD
+
+
+
+
+
+
+
 
 
 
