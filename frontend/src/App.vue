@@ -41,7 +41,7 @@ function handleClick(tabName) {
 </script>
 
 <template>
-  <div class="container">
+  <div :class="route.path === '/' ? 'container-login' : 'container'">
 
     <nav class="tab" v-if="route.path !== '/'">
       <div style="position: absolute; top: 20px; flex-direction: row; display: flex;">
@@ -53,7 +53,8 @@ function handleClick(tabName) {
       </div>
 
       <div style=" position:absolute; bottom: 50px; flex-direction: row; display: flex;">
-        <img v-if="User" :src="`https://images.weserv.nl/?url=${encodeURIComponent(User.picture)}`" style="border-radius: 50%;width: 60px; height: 60px; ">
+        <img v-if="User" :src="`https://images.weserv.nl/?url=${encodeURIComponent(User.picture)}`"
+          style="border-radius: 50%;width: 60px; height: 60px; ">
         <div style="padding-top: 20px; padding-left: 10px;flex-direction: column; display: flex; color: white;">
           <label v-if="User">{{ User.name }}</label>
           <label v-if="User">{{ User.userType }}</label>
@@ -99,11 +100,12 @@ function handleClick(tabName) {
 
       <RouterLink to="/History" class="tab-box" :class="{ active: activeTab === 'history' }"
         @click="handleClick('history')">
-        <svg :style="{ fill: activeTab === 'history' ? 'white' : '#b2b2b2', width: '30px', height: '30px' }" viewBox="-5 -5 35 35">
+        <svg :style="{ fill: activeTab === 'history' ? 'white' : '#b2b2b2', width: '30px', height: '30px' }"
+          viewBox="-5 -5 35 35">
           <path
             d="M 12 0 A 11.972 11.972 0 0 0 4 3.073 V 1 A 1 1 0 0 0 2 1 V 4 A 3 3 0 0 0 5 7 H 8 A 1 1 0 0 0 8 5 H 5 a 0.854 0.854 0 0 1 -0.1 -0.021 A 9.987 9.987 0 1 1 2 12 a 1 1 0 0 0 -2 0 A 12 12 0 1 0 12 0 Z" />
           <path d="M12,6a1,1,0,0,0-1,1v5a1,1,0,0,0,.293.707l3,3a1,1,0,0,0,1.414-1.414L13,11.586V7A1,1,0,0,0,12,6Z" />
-        </svg> 
+        </svg>
         <label :style="{ color: activeTab === 'history' ? 'white' : '#b2b2b2' }"> History</label>
 
       </RouterLink>
@@ -133,8 +135,16 @@ function handleClick(tabName) {
   flex-direction: row;
   display: flex;
   margin-left: 225px;
-  justify-content: center; 
-   align-items: center; 
+  justify-content: center;
+  align-items: center;
+}
+
+.container-login {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  height: 100vh;
 }
 
 .tab {
@@ -155,7 +165,7 @@ function handleClick(tabName) {
 }
 
 .tab-box {
-  width:100%;
+  width: 100%;
   display: flex;
   flex-direction: row;
   gap: 20px;
@@ -163,7 +173,7 @@ function handleClick(tabName) {
   justify-content: flex-start;
 
   height: 35px;
-  color:white;
+  color: white;
   text-decoration: none;
 }
 

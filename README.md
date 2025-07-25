@@ -72,6 +72,7 @@ This is my first personal project using Nest.js, Vue.js, and Terraform. It was c
 ### Future Improvements
 - เพิ่มระบบ login ให้หลากหลาย โดยที่ไม่ได้มีเเค่ google login
 - Deploy ด้วย CI/CD
+- การวางโครงสร้างแอปที่ดี for better perfomance เช่น การที่ทำซ้ำ component หลายๆอัน ควรใช้ for ไม่ควรเขียนซ้ำทุกครั้ง 
 
 ### Contact
 - Gmail: patcharaauikim3800@gmail.com
