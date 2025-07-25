@@ -11,7 +11,7 @@ This is my first personal project using Nest.js, Vue.js, and Terraform. It was c
 ## Smart Inventory
 ### Login
 <p align="center">
-  <img src="./screenshots/login.png" alt="Login Screenshot" width="48%" style="margin-right:20px;"/>
+  <img src="./screenshots/login-edit.png" alt="Login Screenshot" width="48%" style="margin-right:20px;"/>
   <img src="./screenshots/google.png" alt="Login Screenshot" width="48%" />
 </p>
 
